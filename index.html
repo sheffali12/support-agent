@@ -67,6 +67,9 @@
   #sendBtn:active { transform: scale(0.97); }
   #sendBtn:disabled { background: var(--surface2); box-shadow: none; cursor: not-allowed; transform: none; }
   #sendBtn svg { width: 16px; height: 16px; }
+  #micBtn { width: 38px; height: 38px; border-radius: 10px; background: var(--surface2); border: 1px solid rgba(99,179,237,0.15); cursor: pointer; display: grid; place-items: center; flex-shrink: 0; transition: all 0.2s; }
+  #micBtn:hover { background: rgba(99,102,241,0.2); border-color: #6366f1; }
+  #micBtn.listening { background: linear-gradient(135deg, #ef4444, #dc2626); border-color: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.5); animation: pulse 1s ease infinite; }
   .input-hint { text-align: center; font-size: 11px; color: var(--text-dim); margin-top: 9px; }
 
   @keyframes fadeDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
@@ -108,6 +111,14 @@
 <div class="input-area">
   <div class="input-box">
     <textarea id="userInput" rows="1" placeholder="Ask about your banking needs…"></textarea>
+    <button id="micBtn" onclick="toggleVoice()" title="Voice input">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+        <line x1="12" y1="19" x2="12" y2="23"></line>
+        <line x1="8" y1="23" x2="16" y2="23"></line>
+      </svg>
+    </button>
     <button id="sendBtn" onclick="sendMessage()">
       <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -115,7 +126,7 @@
       </svg>
     </button>
   </div>
-  <p class="input-hint">Press Enter to send · Shift+Enter for new line</p>
+  <p class="input-hint">Press Enter to send · Shift+Enter for new line · 🎤 for voice</p>
 </div>
 
 <script>
@@ -154,7 +165,6 @@
 
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
-    bubble.textContent = text;
 
     const time = document.createElement('div');
     time.className = 'msg-time';
@@ -165,8 +175,20 @@
     msg.appendChild(avatar);
     msg.appendChild(body);
     chatWrap.appendChild(msg);
-
     requestAnimationFrame(() => { msg.style.opacity = '1'; });
+
+    if (role === 'bot') {
+      let i = 0;
+      const interval = setInterval(() => {
+        bubble.textContent += text[i];
+        i++;
+        chatWrap.scrollTop = chatWrap.scrollHeight;
+        if (i >= text.length) clearInterval(interval);
+      }, 18);
+    } else {
+      bubble.textContent = text;
+    }
+
     chatWrap.scrollTop = chatWrap.scrollHeight;
   }
 
@@ -201,10 +223,55 @@
       addMessage(data.answer || 'Sorry, I could not get a response.', 'bot');
     } catch (err) {
       removeTyping();
-      addMessage('Connection error. Make sure the backend server is running on port 8000.', 'bot');
+      addMessage('Connection error. Please try again.', 'bot');
     }
     sendBtn.disabled = false;
     userInput.focus();
+  }
+
+  // --- VOICE INPUT ---
+  let recognition = null;
+  let isListening = false;
+
+  function toggleVoice() {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      addMessage('Voice input is not supported in this browser. Please use Chrome!', 'bot');
+      return;
+    }
+    if (isListening) {
+      recognition.stop();
+      return;
+    }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      isListening = true;
+      document.getElementById('micBtn').classList.add('listening');
+      userInput.placeholder = '🎤 Listening...';
+    };
+
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      userInput.value = transcript;
+      sendMessage();
+    };
+
+    recognition.onend = () => {
+      isListening = false;
+      document.getElementById('micBtn').classList.remove('listening');
+      userInput.placeholder = 'Ask about your banking needs…';
+    };
+
+    recognition.onerror = () => {
+      isListening = false;
+      document.getElementById('micBtn').classList.remove('listening');
+      userInput.placeholder = 'Ask about your banking needs…';
+    };
+
+    recognition.start();
   }
 
   function clearChat() {
