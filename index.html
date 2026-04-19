@@ -1,47 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>NBS — Banking Assistant</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #f0f4ff;
-    --surface: #ffffff;
-    --surface2: #eef2fc;
-    --border: rgba(99,102,241,0.15);
-    --border2: rgba(99,102,241,0.25);
-    --accent: #4f6ef7;
-    --accent2: #7c3aed;
-    --text: #1a1f36;
-    --text-dim: #6b7280;
-    --user-bubble: #4f6ef7;
-    --bot-bubble: #ffffff;
-    --radius: 18px;
+    --bg: #f0f4ff; --surface: #ffffff; --surface2: #eef2fc;
+    --border: rgba(99,102,241,0.15); --border2: rgba(99,102,241,0.25);
+    --accent: #4f6ef7; --accent2: #7c3aed;
+    --text: #1a1f36; --text-dim: #6b7280;
+    --user-bubble: #4f6ef7; --bot-bubble: #ffffff; --radius: 18px;
   }
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-weight: 300; }
   body { display: flex; flex-direction: column; align-items: center; min-height: 100vh; min-height: 100dvh; }
 
   .top-bar { width: 100%; height: 4px; background: linear-gradient(90deg, #4f6ef7, #7c3aed, #06b6d4); flex-shrink: 0; }
 
+  /* ── Header ── */
   header { width: 100%; max-width: 760px; padding: 18px 16px 0; display: flex; align-items: center; gap: 12px; animation: fadeDown 0.6s ease both; flex-wrap: wrap; }
   @media (min-width: 480px) { header { padding: 24px 24px 0; gap: 14px; } }
-
   .logo { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #4f6ef7, #7c3aed); display: grid; place-items: center; flex-shrink: 0; box-shadow: 0 4px 14px rgba(79,110,247,0.35); }
   .logo svg { width: 26px; height: 26px; }
-
   .header-text { flex: 1; min-width: 0; }
   .header-text h1 { font-family: 'DM Serif Display', serif; font-size: 15px; font-weight: 400; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .header-text p { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
   @media (min-width: 480px) { .header-text h1 { font-size: 17px; } .header-text p { font-size: 12px; } }
-
   .hackathon-badge { display: none; align-items: center; gap: 6px; background: linear-gradient(135deg, #4f6ef7, #7c3aed); color: #fff; font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 100px; letter-spacing: 0.03em; flex-shrink: 0; }
   .hackathon-badge .hb-dot { width: 6px; height: 6px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s ease infinite; flex-shrink: 0; }
   @media (min-width: 520px) { .hackathon-badge { display: flex; } }
-
   .header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* Language toggle */
+  .lang-toggle { display: flex; align-items: center; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+  .lang-btn { font-size: 11px; font-weight: 500; color: var(--text-dim); background: none; border: none; padding: 5px 9px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .lang-btn.active { background: var(--accent); color: #fff; }
+
   .status-dot { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #059669; }
   .status-dot span { width: 7px; height: 7px; border-radius: 50%; background: #10b981; animation: pulse 2s ease infinite; flex-shrink: 0; }
   .clear-btn { font-size: 11px; color: var(--text-dim); background: none; border: 1px solid var(--border2); border-radius: 8px; padding: 5px 10px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; white-space: nowrap; }
@@ -49,11 +45,13 @@
 
   .divider { width: 100%; max-width: 760px; height: 1px; background: var(--border); margin: 14px 0 0; animation: fadeDown 0.6s 0.1s ease both; opacity: 0; }
 
+  /* ── Chat ── */
   .chat-wrap { width: 100%; max-width: 760px; flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; -webkit-overflow-scrolling: touch; }
   @media (min-width: 480px) { .chat-wrap { padding: 24px; gap: 18px; } }
   .chat-wrap::-webkit-scrollbar { width: 4px; }
   .chat-wrap::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
+  /* ── Welcome ── */
   .welcome { text-align: center; padding: 28px 8px 16px; animation: fadeUp 0.7s 0.2s ease both; opacity: 0; }
   @media (min-width: 480px) { .welcome { padding: 40px 0 20px; } }
   .welcome-icon { width: 64px; height: 64px; border-radius: 20px; background: linear-gradient(135deg, #4f6ef7, #7c3aed); display: grid; place-items: center; margin: 0 auto 18px; box-shadow: 0 8px 28px rgba(79,110,247,0.28); animation: float 3s ease-in-out infinite; }
@@ -69,6 +67,7 @@
   @media (min-width: 480px) { .suggestion { font-size: 13px; padding: 9px 16px; } }
   .suggestion:hover, .suggestion:active { border-color: var(--accent); background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(79,110,247,0.28); }
 
+  /* ── Messages ── */
   .message { display: flex; gap: 10px; animation: fadeUp 0.35s ease both; opacity: 0; }
   @media (min-width: 480px) { .message { gap: 12px; } }
   .message.user { flex-direction: row-reverse; }
@@ -76,7 +75,6 @@
   .message.bot .avatar { background: linear-gradient(135deg, #4f6ef7, #7c3aed); box-shadow: 0 2px 8px rgba(79,110,247,0.3); }
   .message.bot .avatar svg { width: 18px; height: 18px; }
   .message.user .avatar { background: var(--surface2); border: 1px solid var(--border2); font-size: 12px; font-weight: 600; color: var(--accent); }
-
   .msg-body { display: flex; flex-direction: column; max-width: 85%; }
   @media (min-width: 480px) { .msg-body { max-width: 75%; } }
   .message.user .msg-body { align-items: flex-end; }
@@ -86,19 +84,44 @@
   .message.user .bubble { background: var(--user-bubble); border-radius: var(--radius) 4px var(--radius) var(--radius); color: #fff; box-shadow: 0 2px 10px rgba(79,110,247,0.3); }
   .msg-time { font-size: 11px; color: var(--text-dim); margin-top: 5px; padding: 0 2px; }
 
-  .feedback { display: flex; gap: 6px; margin-top: 6px; }
-  .fb-btn { background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; padding: 4px 12px; cursor: pointer; font-size: 13px; transition: all 0.2s; font-family: 'DM Sans', sans-serif; color: var(--text-dim); min-height: 32px; -webkit-tap-highlight-color: transparent; }
+  /* Copy + feedback row */
+  .msg-actions { display: flex; align-items: center; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .copy-btn { background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; padding: 4px 10px; cursor: pointer; font-size: 12px; color: var(--text-dim); transition: all 0.2s; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 4px; min-height: 28px; -webkit-tap-highlight-color: transparent; }
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); background: rgba(79,110,247,0.05); }
+  .copy-btn.copied { color: #059669; border-color: #10b981; background: #ecfdf5; }
+  .fb-btn { background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; padding: 4px 10px; cursor: pointer; font-size: 13px; transition: all 0.2s; font-family: 'DM Sans', sans-serif; color: var(--text-dim); min-height: 28px; -webkit-tap-highlight-color: transparent; }
   .fb-btn:hover { background: var(--surface2); border-color: var(--accent); }
   .fb-btn.good { background: #ecfdf5; border-color: #10b981; color: #059669; }
   .fb-btn.bad { background: #fef2f2; border-color: #f87171; color: #dc2626; }
 
+  /* Follow-up chips */
+  .followups { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .followup-chip { padding: 6px 12px; border-radius: 100px; border: 1px solid var(--border2); background: var(--surface); font-size: 12px; color: var(--accent); cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+  .followup-chip:hover, .followup-chip:active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* Error bubble */
+  .error-bubble { background: #fef2f2; border: 1px solid #fca5a5; border-radius: 4px var(--radius) var(--radius) var(--radius); color: #dc2626; padding: 11px 15px; font-size: 14px; line-height: 1.6; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .retry-btn { background: #dc2626; color: #fff; border: none; border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: background 0.2s; }
+  .retry-btn:hover { background: #b91c1c; }
+
+  /* Typing indicator */
   .typing .bubble { display: flex; align-items: center; gap: 5px; padding: 16px 20px; }
   .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: bounce 1.2s ease infinite; }
   .dot:nth-child(2) { animation-delay: 0.2s; }
   .dot:nth-child(3) { animation-delay: 0.4s; }
 
-  .input-area { width: 100%; max-width: 760px; padding: 10px 12px calc(env(safe-area-inset-bottom, 0px) + 14px); animation: fadeUp 0.6s 0.3s ease both; opacity: 0; }
-  @media (min-width: 480px) { .input-area { padding: 14px 24px calc(env(safe-area-inset-bottom, 0px) + 24px); } }
+  /* Autocomplete suggestions */
+  .autocomplete { width: 100%; max-width: 760px; padding: 0 12px; display: none; }
+  @media (min-width: 480px) { .autocomplete { padding: 0 24px; } }
+  .autocomplete.visible { display: block; }
+  .autocomplete-inner { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .autocomplete-inner::-webkit-scrollbar { display: none; }
+  .ac-chip { padding: 5px 12px; border-radius: 100px; border: 1px solid var(--border2); background: var(--surface); font-size: 12px; color: var(--text-dim); cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: 'DM Sans', sans-serif; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
+  .ac-chip:hover { color: var(--accent); border-color: var(--accent); background: rgba(79,110,247,0.06); }
+
+  /* Input area */
+  .input-area { width: 100%; max-width: 760px; padding: 8px 12px calc(env(safe-area-inset-bottom, 0px) + 14px); animation: fadeUp 0.6s 0.3s ease both; opacity: 0; }
+  @media (min-width: 480px) { .input-area { padding: 10px 24px calc(env(safe-area-inset-bottom, 0px) + 24px); } }
   .input-box { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1.5px solid var(--border2); border-radius: 14px; padding: 8px 8px 8px 14px; transition: border-color 0.2s, box-shadow 0.2s; box-shadow: 0 2px 10px rgba(79,110,247,0.08); }
   @media (min-width: 480px) { .input-box { gap: 10px; border-radius: 16px; padding: 10px 10px 10px 18px; } }
   .input-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,110,247,0.12); }
@@ -115,6 +138,10 @@
   #micBtn.listening { background: linear-gradient(135deg, #ef4444, #dc2626); border-color: #ef4444; box-shadow: 0 0 16px rgba(239,68,68,0.4); animation: pulse 1s ease infinite; }
   .input-hint { text-align: center; font-size: 11px; color: var(--text-dim); margin-top: 8px; display: none; }
   @media (min-width: 600px) { .input-hint { display: block; } }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1a1f36; color: #fff; font-size: 13px; padding: 8px 18px; border-radius: 100px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 999; white-space: nowrap; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   @keyframes fadeDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -140,17 +167,16 @@
       <rect x="22" y="9" width="2.5" height="5" rx="1.25" fill="white" fill-opacity="0.7"/>
     </svg>
   </div>
-
   <div class="header-text">
     <h1>National Banking Services</h1>
     <p>AI-Powered Support Assistant</p>
   </div>
-
-  <div class="hackathon-badge">
-    <span class="hb-dot"></span> Hackathon Demo
-  </div>
-
+  <div class="hackathon-badge"><span class="hb-dot"></span> Hackathon Demo</div>
   <div class="header-right">
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btnEn" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="btnHi" onclick="setLang('hi')">हि</button>
+    </div>
     <button class="clear-btn" onclick="clearChat()">Clear</button>
     <div class="status-dot"><span></span> Online</div>
   </div>
@@ -158,30 +184,11 @@
 
 <div class="divider"></div>
 
-<div class="chat-wrap" id="chatWrap">
-  <div class="welcome" id="welcome">
-    <div class="welcome-icon">
-      <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <line x1="19" y1="2" x2="19" y2="8" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
-        <circle cx="19" cy="1.8" r="2" fill="white"/>
-        <rect x="5" y="8" width="28" height="20" rx="6" fill="white" fill-opacity="0.95"/>
-        <rect x="10" y="14" width="5" height="5" rx="2" fill="#4f6ef7"/>
-        <rect x="23" y="14" width="5" height="5" rx="2" fill="#7c3aed"/>
-        <path d="M13 24 Q19 28 25 24" stroke="#4f6ef7" stroke-width="2" stroke-linecap="round" fill="none"/>
-        <rect x="1" y="13" width="4" height="8" rx="2" fill="white" fill-opacity="0.6"/>
-        <rect x="33" y="13" width="4" height="8" rx="2" fill="white" fill-opacity="0.6"/>
-      </svg>
-    </div>
-    <h2>How can I <em>help you</em> today?</h2>
-    <p>Ask me anything about accounts, loans, interest rates, fees, or banking services.</p>
-    <div class="suggestions">
-      <button class="suggestion" onclick="sendSuggestion(this)">Savings account rates</button>
-      <button class="suggestion" onclick="sendSuggestion(this)">How to apply for a loan?</button>
-      <button class="suggestion" onclick="sendSuggestion(this)">Credit card fees</button>
-      <button class="suggestion" onclick="sendSuggestion(this)">Fixed deposit interest</button>
-      <button class="suggestion" onclick="sendSuggestion(this)">How to open an account?</button>
-    </div>
-  </div>
+<div class="chat-wrap" id="chatWrap"></div>
+
+<!-- Autocomplete suggestions -->
+<div class="autocomplete" id="autocomplete">
+  <div class="autocomplete-inner" id="autocompleteInner"></div>
 </div>
 
 <div class="input-area">
@@ -189,169 +196,436 @@
     <textarea id="userInput" rows="1" placeholder="Ask about your banking needs…"></textarea>
     <button id="micBtn" onclick="toggleVoice()" title="Voice input">
       <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-        <line x1="12" y1="19" x2="12" y2="23"></line>
-        <line x1="8" y1="23" x2="16" y2="23"></line>
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
       </svg>
     </button>
     <button id="sendBtn" onclick="sendMessage()">
       <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="22" y1="2" x2="11" y2="13"></line>
-        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
       </svg>
     </button>
   </div>
   <p class="input-hint">Press Enter to send · Shift+Enter for new line · 🎤 for voice</p>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
-  const chatWrap = document.getElementById('chatWrap');
-  const userInput = document.getElementById('userInput');
-  const sendBtn = document.getElementById('sendBtn');
-  const API_URL = 'https://support-agent-production-ce11.up.railway.app/chat';
-  const sessionId = 'user_' + Math.random().toString(36).slice(2, 9);
+const chatWrap = document.getElementById('chatWrap');
+const userInput = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+const autocompleteEl = document.getElementById('autocomplete');
+const autocompleteInner = document.getElementById('autocompleteInner');
 
-  const BOT_SVG = `<svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <line x1="13" y1="2" x2="13" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-    <circle cx="13" cy="1.5" r="1.5" fill="white"/>
-    <rect x="4" y="6" width="18" height="13" rx="4" fill="white" fill-opacity="0.95"/>
-    <rect x="8" y="10" width="3.5" height="3.5" rx="1.5" fill="#4f6ef7"/>
-    <rect x="14.5" y="10" width="3.5" height="3.5" rx="1.5" fill="#7c3aed"/>
-    <path d="M9 16.5 Q13 19 17 16.5" stroke="#4f6ef7" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-    <rect x="1.5" y="9" width="2.5" height="5" rx="1.25" fill="white" fill-opacity="0.7"/>
-    <rect x="22" y="9" width="2.5" height="5" rx="1.25" fill="white" fill-opacity="0.7"/>
-  </svg>`;
+const API_URL = 'https://support-agent-production-ce11.up.railway.app/chat';
+const sessionId = 'user_' + Math.random().toString(36).slice(2, 9);
+const STORAGE_KEY = 'nbs_chat_history';
 
-  const WELCOME_SVG = `<svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <line x1="19" y1="2" x2="19" y2="8" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
-    <circle cx="19" cy="1.8" r="2" fill="white"/>
-    <rect x="5" y="8" width="28" height="20" rx="6" fill="white" fill-opacity="0.95"/>
-    <rect x="10" y="14" width="5" height="5" rx="2" fill="#4f6ef7"/>
-    <rect x="23" y="14" width="5" height="5" rx="2" fill="#7c3aed"/>
-    <path d="M13 24 Q19 28 25 24" stroke="#4f6ef7" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <rect x="1" y="13" width="4" height="8" rx="2" fill="white" fill-opacity="0.6"/>
-    <rect x="33" y="13" width="4" height="8" rx="2" fill="white" fill-opacity="0.6"/>
-  </svg>`;
+// ── Language ──
+let lang = localStorage.getItem('nbs_lang') || 'en';
 
-  userInput.addEventListener('input', () => {
-    userInput.style.height = 'auto';
-    userInput.style.height = Math.min(userInput.scrollHeight, 120) + 'px';
+const I18N = {
+  en: {
+    placeholder: 'Ask about your banking needs…',
+    welcome_title: 'How can I <em>help you</em> today?',
+    welcome_sub: 'Ask me anything about accounts, loans, interest rates, fees, or banking services.',
+    suggestions: ['Savings account rates', 'How to apply for a loan?', 'Credit card fees', 'Fixed deposit interest', 'How to open an account?'],
+    listening: '🎤 Listening…',
+    conn_error: 'Connection error. Please check your internet and try again.',
+    copied: 'Copied!',
+    retry: 'Retry',
+    followups: {
+      'savings': ['What is the minimum balance?', 'How to open savings account?', 'Is interest taxable?'],
+      'loan': ['What documents are needed?', 'What is the interest rate?', 'How long does approval take?'],
+      'credit': ['How to apply for a credit card?', 'What is the credit limit?', 'Annual fee details?'],
+      'deposit': ['What is the minimum deposit?', 'Can I withdraw early?', 'Auto-renewal options?'],
+      'account': ['Documents required?', 'How long does it take?', 'Is there a minimum balance?'],
+      'default': ['Tell me more', 'What are the fees?', 'How do I get started?']
+    }
+  },
+  hi: {
+    placeholder: 'अपने बैंकिंग सवाल पूछें…',
+    welcome_title: 'आज मैं आपकी <em>कैसे मदद</em> कर सकता हूँ?',
+    welcome_sub: 'खाते, लोन, ब्याज दर, शुल्क या किसी भी बैंकिंग सेवा के बारे में पूछें।',
+    suggestions: ['बचत खाते की ब्याज दर', 'लोन के लिए आवेदन कैसे करें?', 'क्रेडिट कार्ड शुल्क', 'फिक्स्ड डिपॉजिट ब्याज', 'खाता कैसे खोलें?'],
+    listening: '🎤 सुन रहा हूँ…',
+    conn_error: 'कनेक्शन त्रुटि। कृपया अपना इंटरनेट जाँचें और पुनः प्रयास करें।',
+    copied: 'कॉपी हो गया!',
+    retry: 'पुनः प्रयास',
+    followups: {
+      'savings': ['न्यूनतम बैलेंस क्या है?', 'बचत खाता कैसे खोलें?', 'ब्याज पर टैक्स लगता है?'],
+      'loan': ['कौन से दस्तावेज़ चाहिए?', 'ब्याज दर क्या है?', 'अनुमोदन में कितना समय?'],
+      'credit': ['क्रेडिट कार्ड कैसे मिलेगा?', 'क्रेडिट लिमिट क्या है?', 'वार्षिक शुल्क क्या है?'],
+      'deposit': ['न्यूनतम जमा कितनी है?', 'क्या जल्दी निकाल सकते हैं?', 'ऑटो-नवीनीकरण विकल्प?'],
+      'account': ['कौन से दस्तावेज़ चाहिए?', 'कितना समय लगेगा?', 'न्यूनतम बैलेंस है?'],
+      'default': ['और बताइए', 'शुल्क क्या हैं?', 'कैसे शुरू करें?']
+    }
+  }
+};
+
+function t() { return I18N[lang]; }
+
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('nbs_lang', l);
+  document.getElementById('btnEn').classList.toggle('active', l === 'en');
+  document.getElementById('btnHi').classList.toggle('active', l === 'hi');
+  userInput.placeholder = t().placeholder;
+  const rec = document.getElementById('micBtn');
+  if (rec) rec.title = lang === 'hi' ? 'आवाज़ इनपुट' : 'Voice input';
+  const w = document.getElementById('welcome');
+  if (w) renderWelcome();
+}
+
+// ── SVGs ──
+const BOT_SVG = `<svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <line x1="13" y1="2" x2="13" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+  <circle cx="13" cy="1.5" r="1.5" fill="white"/>
+  <rect x="4" y="6" width="18" height="13" rx="4" fill="white" fill-opacity="0.95"/>
+  <rect x="8" y="10" width="3.5" height="3.5" rx="1.5" fill="#4f6ef7"/>
+  <rect x="14.5" y="10" width="3.5" height="3.5" rx="1.5" fill="#7c3aed"/>
+  <path d="M9 16.5 Q13 19 17 16.5" stroke="#4f6ef7" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <rect x="1.5" y="9" width="2.5" height="5" rx="1.25" fill="white" fill-opacity="0.7"/>
+  <rect x="22" y="9" width="2.5" height="5" rx="1.25" fill="white" fill-opacity="0.7"/>
+</svg>`;
+
+const WELCOME_SVG = `<svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <line x1="19" y1="2" x2="19" y2="8" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="19" cy="1.8" r="2" fill="white"/>
+  <rect x="5" y="8" width="28" height="20" rx="6" fill="white" fill-opacity="0.95"/>
+  <rect x="10" y="14" width="5" height="5" rx="2" fill="#4f6ef7"/>
+  <rect x="23" y="14" width="5" height="5" rx="2" fill="#7c3aed"/>
+  <path d="M13 24 Q19 28 25 24" stroke="#4f6ef7" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <rect x="1" y="13" width="4" height="8" rx="2" fill="white" fill-opacity="0.6"/>
+  <rect x="33" y="13" width="4" height="8" rx="2" fill="white" fill-opacity="0.6"/>
+</svg>`;
+
+// ── localStorage history ──
+function saveHistory() {
+  const msgs = [];
+  chatWrap.querySelectorAll('.message').forEach(m => {
+    const role = m.classList.contains('user') ? 'user' : 'bot';
+    const text = m.querySelector('.bubble')?.textContent || '';
+    const time = m.querySelector('.msg-time')?.textContent || '';
+    if (text) msgs.push({ role, text, time });
   });
-  userInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-  });
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(msgs)); } catch(e) {}
+}
 
-  function sendSuggestion(btn) { userInput.value = btn.textContent; sendMessage(); }
-  function getTime() { return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
+function loadHistory() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return false;
+    const msgs = JSON.parse(saved);
+    if (!msgs.length) return false;
+    msgs.forEach(m => addMessage(m.text, m.role, m.time, true));
+    return true;
+  } catch(e) { return false; }
+}
 
-  function addMessage(text, role) {
-    const welcome = document.getElementById('welcome');
-    if (welcome) welcome.remove();
+// ── Toast ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
 
-    const msg = document.createElement('div');
-    msg.className = `message ${role}`;
+// ── Time ──
+function getTime() { return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
 
-    const avatar = document.createElement('div');
-    avatar.className = 'avatar';
-    if (role === 'bot') { avatar.innerHTML = BOT_SVG; } else { avatar.textContent = 'U'; }
+// ── Follow-up chips logic ──
+function getFollowups(text) {
+  const lower = text.toLowerCase();
+  const fu = t().followups;
+  if (lower.includes('saving') || lower.includes('बचत')) return fu.savings;
+  if (lower.includes('loan') || lower.includes('लोन')) return fu.loan;
+  if (lower.includes('credit') || lower.includes('क्रेडिट')) return fu.credit;
+  if (lower.includes('deposit') || lower.includes('डिपॉज़िट') || lower.includes('fixed') || lower.includes('फिक्स्ड')) return fu.deposit;
+  if (lower.includes('account') || lower.includes('खाता') || lower.includes('open') || lower.includes('खोल')) return fu.account;
+  return fu.default;
+}
 
-    const body = document.createElement('div');
-    body.className = 'msg-body';
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    const time = document.createElement('div');
-    time.className = 'msg-time';
-    time.textContent = getTime();
+// ── Add message ──
+function addMessage(text, role, timeStr, silent) {
+  const welcome = document.getElementById('welcome');
+  if (welcome) welcome.remove();
 
-    body.appendChild(bubble);
-    body.appendChild(time);
-    msg.appendChild(avatar);
-    msg.appendChild(body);
-    chatWrap.appendChild(msg);
-    requestAnimationFrame(() => { msg.style.opacity = '1'; });
+  const msg = document.createElement('div');
+  msg.className = `message ${role}`;
 
-    if (role === 'bot') {
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  if (role === 'bot') { avatar.innerHTML = BOT_SVG; } else { avatar.textContent = 'U'; }
+
+  const body = document.createElement('div');
+  body.className = 'msg-body';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+
+  const msgTime = document.createElement('div');
+  msgTime.className = 'msg-time';
+  msgTime.textContent = timeStr || getTime();
+
+  body.appendChild(bubble);
+  body.appendChild(msgTime);
+  msg.appendChild(avatar);
+  msg.appendChild(body);
+  chatWrap.appendChild(msg);
+  requestAnimationFrame(() => { msg.style.opacity = '1'; });
+
+  if (role === 'bot') {
+    if (silent) {
+      bubble.textContent = text;
+      addBotActions(body, text);
+    } else {
       let i = 0;
       const interval = setInterval(() => {
         bubble.textContent += text[i]; i++;
         chatWrap.scrollTop = chatWrap.scrollHeight;
         if (i >= text.length) {
           clearInterval(interval);
-          const fb = document.createElement('div');
-          fb.className = 'feedback';
-          fb.innerHTML = `<button class="fb-btn" onclick="giveFeedback(this,'good')">👍</button><button class="fb-btn" onclick="giveFeedback(this,'bad')">👎</button>`;
-          body.appendChild(fb);
+          addBotActions(body, text);
+          saveHistory();
         }
-      }, 18);
-    } else {
-      bubble.textContent = text;
+      }, 16);
     }
-    chatWrap.scrollTop = chatWrap.scrollHeight;
+  } else {
+    bubble.textContent = text;
+    if (!silent) saveHistory();
   }
 
-  function addTyping() {
-    const msg = document.createElement('div');
-    msg.className = 'message bot typing'; msg.id = 'typing';
-    msg.innerHTML = `<div class="avatar">${BOT_SVG}</div><div class="bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
-    chatWrap.appendChild(msg);
-    requestAnimationFrame(() => { msg.style.opacity = '1'; });
-    chatWrap.scrollTop = chatWrap.scrollHeight;
-  }
-  function removeTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
+  chatWrap.scrollTop = chatWrap.scrollHeight;
+}
 
-  async function sendMessage() {
-    const text = userInput.value.trim();
-    if (!text) return;
-    userInput.value = ''; userInput.style.height = 'auto';
-    sendBtn.disabled = true;
-    addMessage(text, 'user'); addTyping();
-    try {
-      const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question: text, session_id: sessionId }) });
-      const data = await res.json();
-      removeTyping();
-      addMessage(data.answer || 'Sorry, I could not get a response.', 'bot');
-    } catch (err) {
-      removeTyping();
-      addMessage('Connection error. Please try again.', 'bot');
-    }
-    sendBtn.disabled = false; userInput.focus();
-  }
+function addBotActions(body, text) {
+  const actions = document.createElement('div');
+  actions.className = 'msg-actions';
+  actions.innerHTML = `
+    <button class="copy-btn" onclick="copyText(this, '${encodeURIComponent(text)}')">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Copy
+    </button>
+    <button class="fb-btn" onclick="giveFeedback(this,'good')">👍</button>
+    <button class="fb-btn" onclick="giveFeedback(this,'bad')">👎</button>
+  `;
+  body.appendChild(actions);
 
-  function giveFeedback(btn, type) {
-    btn.parentElement.querySelectorAll('.fb-btn').forEach(b => b.disabled = true);
-    btn.classList.add(type === 'good' ? 'good' : 'bad');
-    btn.textContent = type === 'good' ? '👍 Thanks!' : '👎 Sorry!';
+  const chips = getFollowups(text);
+  if (chips.length) {
+    const fu = document.createElement('div');
+    fu.className = 'followups';
+    chips.forEach(c => {
+      const btn = document.createElement('button');
+      btn.className = 'followup-chip';
+      btn.textContent = c;
+      btn.onclick = () => { userInput.value = c; sendMessage(); };
+      fu.appendChild(btn);
+    });
+    body.appendChild(fu);
   }
+}
 
-  let recognition = null, isListening = false;
-  function toggleVoice() {
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) { addMessage('Voice input is not supported in this browser. Please use Chrome!', 'bot'); return; }
-    if (isListening) { recognition.stop(); return; }
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SR(); recognition.lang = 'en-US'; recognition.interimResults = false;
-    recognition.onstart = () => { isListening = true; document.getElementById('micBtn').classList.add('listening'); userInput.placeholder = '🎤 Listening...'; };
-    recognition.onresult = (e) => { userInput.value = e.results[0][0].transcript; sendMessage(); };
-    recognition.onend = recognition.onerror = () => { isListening = false; document.getElementById('micBtn').classList.remove('listening'); userInput.placeholder = 'Ask about your banking needs…'; };
-    recognition.start();
-  }
+function addErrorBubble(lastText) {
+  const welcome = document.getElementById('welcome');
+  if (welcome) welcome.remove();
 
-  function clearChat() {
-    chatWrap.innerHTML = '';
-    const w = document.createElement('div');
-    w.className = 'welcome'; w.id = 'welcome'; w.style.opacity = '1';
-    w.innerHTML = `<div class="welcome-icon">${WELCOME_SVG}</div>
-      <h2>How can I <em>help you</em> today?</h2>
-      <p>Ask me anything about accounts, loans, interest rates, fees, or banking services.</p>
-      <div class="suggestions">
-        <button class="suggestion" onclick="sendSuggestion(this)">Savings account rates</button>
-        <button class="suggestion" onclick="sendSuggestion(this)">How to apply for a loan?</button>
-        <button class="suggestion" onclick="sendSuggestion(this)">Credit card fees</button>
-        <button class="suggestion" onclick="sendSuggestion(this)">Fixed deposit interest</button>
-        <button class="suggestion" onclick="sendSuggestion(this)">How to open an account?</button>
-      </div>`;
-    chatWrap.appendChild(w);
+  const msg = document.createElement('div');
+  msg.className = 'message bot';
+  msg.style.opacity = '1';
+
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  avatar.innerHTML = BOT_SVG;
+
+  const body = document.createElement('div');
+  body.className = 'msg-body';
+
+  const errDiv = document.createElement('div');
+  errDiv.className = 'error-bubble';
+  errDiv.innerHTML = `⚠️ ${t().conn_error} <button class="retry-btn" onclick="retryMessage(this, '${encodeURIComponent(lastText)}')">${t().retry}</button>`;
+
+  body.appendChild(errDiv);
+  msg.appendChild(avatar);
+  msg.appendChild(body);
+  chatWrap.appendChild(msg);
+  chatWrap.scrollTop = chatWrap.scrollHeight;
+}
+
+async function retryMessage(btn, encodedText) {
+  const text = decodeURIComponent(encodedText);
+  btn.closest('.message').remove();
+  addMessage(text, 'user');
+  await callAPI(text);
+}
+
+function addTyping() {
+  const msg = document.createElement('div');
+  msg.className = 'message bot typing'; msg.id = 'typing';
+  msg.innerHTML = `<div class="avatar">${BOT_SVG}</div><div class="bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  chatWrap.appendChild(msg);
+  requestAnimationFrame(() => { msg.style.opacity = '1'; });
+  chatWrap.scrollTop = chatWrap.scrollHeight;
+}
+function removeTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
+
+async function callAPI(text) {
+  addTyping();
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: text, session_id: sessionId })
+    });
+    const data = await res.json();
+    removeTyping();
+    addMessage(data.answer || 'Sorry, I could not get a response.', 'bot');
+  } catch (err) {
+    removeTyping();
+    addErrorBubble(text);
   }
+  sendBtn.disabled = false;
+  userInput.focus();
+}
+
+async function sendMessage() {
+  const text = userInput.value.trim();
+  if (!text) return;
+  userInput.value = ''; userInput.style.height = 'auto';
+  hideAutocomplete();
+  sendBtn.disabled = true;
+  addMessage(text, 'user');
+  await callAPI(text);
+}
+
+function copyText(btn, encodedText) {
+  const text = decodeURIComponent(encodedText);
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${t().copied}`;
+    showToast(t().copied);
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+    }, 2000);
+  }).catch(() => showToast('Copy failed'));
+}
+
+function giveFeedback(btn, type) {
+  btn.parentElement.querySelectorAll('.fb-btn').forEach(b => b.disabled = true);
+  btn.classList.add(type === 'good' ? 'good' : 'bad');
+  btn.textContent = type === 'good' ? '👍' : '👎';
+}
+
+// ── Autocomplete ──
+const AC_SUGGESTIONS = {
+  en: [
+    'How do I apply for a loan?',
+    'What is the savings account interest rate?',
+    'How to open a new account?',
+    'Fixed deposit rates',
+    'Credit card fees and charges',
+    'How to transfer money?',
+    'What documents do I need?',
+    'How to reset my PIN?',
+    'What is the minimum balance?',
+    'How to close my account?',
+    'Net banking setup',
+    'ATM withdrawal limit',
+  ],
+  hi: [
+    'लोन के लिए कैसे आवेदन करें?',
+    'बचत खाते की ब्याज दर क्या है?',
+    'नया खाता कैसे खोलें?',
+    'फिक्स्ड डिपॉजिट दरें',
+    'क्रेडिट कार्ड शुल्क',
+    'पैसे ट्रांसफर कैसे करें?',
+    'कौन से दस्तावेज़ चाहिए?',
+    'पिन रीसेट कैसे करें?',
+    'न्यूनतम बैलेंस क्या है?',
+    'खाता बंद कैसे करें?',
+  ]
+};
+
+function showAutocomplete(query) {
+  if (!query) { hideAutocomplete(); return; }
+  const list = AC_SUGGESTIONS[lang] || AC_SUGGESTIONS.en;
+  const matches = list.filter(s => s.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
+  if (!matches.length) { hideAutocomplete(); return; }
+  autocompleteInner.innerHTML = '';
+  matches.forEach(m => {
+    const chip = document.createElement('button');
+    chip.className = 'ac-chip';
+    chip.textContent = m;
+    chip.onclick = () => { userInput.value = m; hideAutocomplete(); sendMessage(); };
+    autocompleteInner.appendChild(chip);
+  });
+  autocompleteEl.classList.add('visible');
+}
+function hideAutocomplete() { autocompleteEl.classList.remove('visible'); }
+
+userInput.addEventListener('input', () => {
+  userInput.style.height = 'auto';
+  userInput.style.height = Math.min(userInput.scrollHeight, 120) + 'px';
+  showAutocomplete(userInput.value.trim());
+});
+
+userInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  if (e.key === 'Escape') hideAutocomplete();
+});
+
+// ── Welcome screen ──
+function renderWelcome() {
+  const existing = document.getElementById('welcome');
+  if (existing) existing.remove();
+  const w = document.createElement('div');
+  w.className = 'welcome'; w.id = 'welcome'; w.style.opacity = '1';
+  w.innerHTML = `
+    <div class="welcome-icon">${WELCOME_SVG}</div>
+    <h2>${t().welcome_title}</h2>
+    <p>${t().welcome_sub}</p>
+    <div class="suggestions">
+      ${t().suggestions.map(s => `<button class="suggestion" onclick="sendSuggestion(this)">${s}</button>`).join('')}
+    </div>`;
+  chatWrap.insertBefore(w, chatWrap.firstChild);
+}
+
+function sendSuggestion(btn) { userInput.value = btn.textContent; sendMessage(); }
+
+function clearChat() {
+  chatWrap.innerHTML = '';
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  renderWelcome();
+}
+
+// ── Voice ──
+let recognition = null, isListening = false;
+function toggleVoice() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    addMessage('Voice input is not supported in this browser. Please use Chrome!', 'bot');
+    return;
+  }
+  if (isListening) { recognition.stop(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
+  recognition.interimResults = false;
+  recognition.onstart = () => { isListening = true; document.getElementById('micBtn').classList.add('listening'); userInput.placeholder = t().listening; };
+  recognition.onresult = (e) => { userInput.value = e.results[0][0].transcript; sendMessage(); };
+  recognition.onend = recognition.onerror = () => { isListening = false; document.getElementById('micBtn').classList.remove('listening'); userInput.placeholder = t().placeholder; };
+  recognition.start();
+}
+
+// ── Init ──
+userInput.placeholder = t().placeholder;
+const hasHistory = loadHistory();
+if (!hasHistory) renderWelcome();
 </script>
 </body>
 </html>
