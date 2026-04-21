@@ -9,26 +9,28 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Palette */
-  --navy-deep:   #080d18;
-  --navy:        #0c1526;
-  --navy-mid:    #111d33;
-  --navy-light:  #172040;
-  --navy-card:   #0f1a30;
-  --navy-hover:  #162038;
+  --navy-deep:   #030f18;
+  --navy:        #051525;
+  --navy-mid:    #071d30;
+  --navy-light:  #0a2540;
+  --navy-card:   #061a2d;
+  --navy-hover:  #0b2438;
 
-  --gold:        #c9a84c;
-  --gold-light:  #e2c97e;
-  --gold-dim:    rgba(201,168,76,0.18);
-  --gold-border: rgba(201,168,76,0.22);
+  --gold:        #2dd4bf;
+  --gold-light:  #5eead4;
+  --gold-dim:    rgba(45,212,191,0.12);
+  --gold-border: rgba(45,212,191,0.22);
 
-  --border:      rgba(255,255,255,0.07);
-  --border2:     rgba(255,255,255,0.11);
+  --accent2:     #38bdf8;
+  --accent2-dim: rgba(56,189,248,0.10);
 
-  --text:        #e8edf5;
-  --text-dim:    rgba(232,237,245,0.50);
-  --text-dim2:   rgba(232,237,245,0.28);
-  --text-muted:  rgba(232,237,245,0.18);
+  --border:      rgba(255,255,255,0.06);
+  --border2:     rgba(255,255,255,0.10);
+
+  --text:        #e2f0f9;
+  --text-dim:    rgba(226,240,249,0.50);
+  --text-dim2:   rgba(226,240,249,0.28);
+  --text-muted:  rgba(226,240,249,0.18);
 
   --success:     #4ade80;
   --danger:      #f87171;
@@ -55,13 +57,12 @@ body {
   overflow: hidden;
 }
 
-/* ── Subtle background texture ── */
 body::before {
   content: '';
   position: fixed; inset: 0; pointer-events: none; z-index: 0;
   background:
-    radial-gradient(ellipse 60% 50% at 80% 10%, rgba(201,168,76,0.04) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 10% 80%, rgba(16,40,90,0.6) 0%, transparent 60%);
+    radial-gradient(ellipse 60% 50% at 80% 10%, rgba(45,212,191,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 10% 80%, rgba(56,189,248,0.07) 0%, transparent 60%);
 }
 body::after {
   content: '';
@@ -70,7 +71,6 @@ body::after {
   opacity: 0.022;
 }
 
-/* ── Shell ── */
 .shell {
   position: relative; z-index: 2;
   width: 100%; max-width: 820px;
@@ -85,7 +85,7 @@ header {
   height: 62px;
   display: flex; align-items: center; gap: 14px;
   border-bottom: 1px solid var(--border);
-  background: rgba(8,13,24,0.92);
+  background: rgba(3,15,24,0.94);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   animation: slideDown 0.7s cubic-bezier(0.22,1,0.36,1) both;
@@ -95,15 +95,12 @@ header {
 .logo {
   width: 38px; height: 38px; border-radius: 10px;
   border: 1px solid var(--gold-border);
-  background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.04));
+  background: linear-gradient(135deg, rgba(45,212,191,0.15), rgba(45,212,191,0.04));
   display: grid; place-items: center; flex-shrink: 0;
 }
 .logo svg { width: 20px; height: 20px; }
 
-.header-divider {
-  width: 1px; height: 24px;
-  background: var(--border2); flex-shrink: 0;
-}
+.header-divider { width: 1px; height: 24px; background: var(--border2); flex-shrink: 0; }
 
 .brand { flex: 1; min-width: 0; }
 .brand-name {
@@ -130,24 +127,16 @@ header {
   padding: 6px 10px; cursor: pointer; transition: all 0.2s;
   letter-spacing: 0.03em;
 }
-.lang-btn.active {
-  background: var(--gold-dim);
-  color: var(--gold-light);
-  border-right: 1px solid var(--gold-border);
-}
+.lang-btn.active { background: var(--gold-dim); color: var(--gold-light); border-right: 1px solid var(--gold-border); }
 .lang-btn:last-child.active { border-right: none; border-left: 1px solid var(--gold-border); }
 
 .status-badge {
   display: flex; align-items: center; gap: 5px;
   padding: 5px 11px; border-radius: 100px;
   background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.16);
-  font-size: 11px; font-weight: 500; color: #4ade80;
-  letter-spacing: 0.02em;
+  font-size: 11px; font-weight: 500; color: #4ade80; letter-spacing: 0.02em;
 }
-.status-pulse {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: #4ade80; animation: pulse 2.2s ease infinite;
-}
+.status-pulse { width: 5px; height: 5px; border-radius: 50%; background: #4ade80; animation: pulse 2.2s ease infinite; }
 
 .icon-btn {
   width: 34px; height: 34px; border-radius: 8px;
@@ -155,7 +144,7 @@ header {
   cursor: pointer; display: grid; place-items: center; flex-shrink: 0;
   transition: all 0.2s; -webkit-tap-highlight-color: transparent;
 }
-.icon-btn:hover { border-color: var(--border2); background: var(--navy-hover); }
+.icon-btn:hover { background: var(--navy-hover); }
 
 /* ── Chat ── */
 .chat-wrap {
@@ -177,16 +166,15 @@ header {
 
 .welcome-header {
   display: flex; align-items: flex-start; gap: 16px;
-  padding: 4px 0 28px;
+  padding: 4px 0 24px;
 }
 .welcome-icon-wrap {
   width: 52px; height: 52px; flex-shrink: 0; border-radius: 14px;
   border: 1px solid var(--gold-border);
-  background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(201,168,76,0.03));
+  background: linear-gradient(135deg, rgba(45,212,191,0.12), rgba(45,212,191,0.03));
   display: grid; place-items: center; margin-top: 4px;
 }
 .welcome-icon-wrap svg { width: 28px; height: 28px; }
-.welcome-copy {}
 .welcome-copy h2 {
   font-family: var(--font-serif);
   font-size: clamp(28px, 5.5vw, 44px);
@@ -201,49 +189,138 @@ header {
   font-size: 14px; color: var(--text-dim); line-height: 1.65; max-width: 440px; font-weight: 300;
 }
 
-/* Service cards */
-.services-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px; margin-bottom: 24px;
-}
-@media(min-width:480px){ .services-row { grid-template-columns: repeat(4, 1fr); gap: 12px; } }
+/* ── SERVICE HIERARCHY LAYOUT ── */
+.services-section { margin-bottom: 22px; }
 
-.service-card {
-  background: var(--navy-card);
-  border: 1px solid var(--border);
+/* Primary tier label */
+.tier-label {
+  font-size: 9.5px; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; margin-bottom: 9px;
+  display: flex; align-items: center; gap: 7px;
+}
+.tier-label.primary { color: var(--gold); }
+.tier-label.secondary { color: var(--text-muted); }
+.tier-label::after {
+  content: '';
+  flex: 1; height: 1px;
+}
+.tier-label.primary::after { background: linear-gradient(90deg, var(--gold-border), transparent); }
+.tier-label.secondary::after { background: linear-gradient(90deg, var(--border), transparent); }
+
+/* Primary row — 2 large cards side by side */
+.primary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+@media(min-width:480px){ .primary-row { gap: 12px; } }
+
+/* Primary card — larger, highlighted */
+.service-card-primary {
+  background: linear-gradient(145deg, #052235, #041a2a);
+  border: 1px solid var(--gold-border);
   border-radius: var(--radius);
-  padding: 16px 14px;
+  padding: 20px 16px;
   cursor: pointer;
   transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
   -webkit-tap-highlight-color: transparent;
   position: relative; overflow: hidden;
 }
-.service-card::before {
+.service-card-primary::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold-border), transparent);
-  opacity: 0; transition: opacity 0.22s;
+  background: linear-gradient(90deg, transparent, rgba(45,212,191,0.5), transparent);
 }
-.service-card:hover { background: var(--navy-hover); border-color: var(--gold-border); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.3); }
-.service-card:hover::before { opacity: 1; }
-.service-card:active { transform: scale(0.98); }
+.service-card-primary::after {
+  content: '';
+  position: absolute; bottom: 0; right: 0;
+  width: 80px; height: 80px;
+  background: radial-gradient(circle, rgba(45,212,191,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.service-card-primary:hover {
+  background: linear-gradient(145deg, #073045, #052033);
+  border-color: rgba(45,212,191,0.45);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px rgba(0,0,0,0.35), 0 0 0 1px rgba(45,212,191,0.1);
+}
+.service-card-primary:active { transform: scale(0.98); }
 
-.sc-icon {
-  width: 32px; height: 32px; border-radius: 9px;
+.scp-badge {
+  display: inline-flex; align-items: center; gap: 4px;
   background: var(--gold-dim); border: 1px solid var(--gold-border);
-  display: grid; place-items: center; margin-bottom: 10px;
-}
-.sc-icon svg { width: 16px; height: 16px; }
-.sc-label {
-  font-size: 12px; font-weight: 600; color: var(--text);
-  letter-spacing: -0.01em; line-height: 1.3; margin-bottom: 3px;
-}
-.sc-desc {
-  font-size: 11px; color: var(--text-dim2); font-weight: 300;
+  border-radius: 100px; padding: 2px 8px;
+  font-size: 9px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--gold-light);
+  margin-bottom: 10px;
 }
 
-/* Divider line */
+.scp-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, rgba(45,212,191,0.2), rgba(45,212,191,0.06));
+  border: 1px solid var(--gold-border);
+  display: grid; place-items: center; margin-bottom: 12px;
+}
+.scp-icon svg { width: 18px; height: 18px; }
+
+.scp-label {
+  font-size: 14px; font-weight: 600; color: var(--text);
+  letter-spacing: -0.01em; margin-bottom: 4px; line-height: 1.2;
+}
+.scp-desc {
+  font-size: 11.5px; color: var(--text-dim); font-weight: 300; line-height: 1.5;
+}
+.scp-arrow {
+  position: absolute; bottom: 14px; right: 14px;
+  color: var(--gold); opacity: 0.5;
+  transition: all 0.2s;
+}
+.service-card-primary:hover .scp-arrow { opacity: 1; transform: translate(2px, -2px); }
+
+/* Secondary row — 2 smaller cards */
+.secondary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media(min-width:480px){ .secondary-row { gap: 10px; } }
+
+/* Secondary card — smaller, muted */
+.service-card-secondary {
+  background: var(--navy-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 13px 13px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.22,1,0.36,1);
+  -webkit-tap-highlight-color: transparent;
+  display: flex; align-items: center; gap: 11px;
+  position: relative; overflow: hidden;
+}
+.service-card-secondary:hover {
+  background: var(--navy-hover);
+  border-color: var(--border2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+}
+.service-card-secondary:active { transform: scale(0.98); }
+
+.scs-icon {
+  width: 28px; height: 28px; min-width: 28px; border-radius: 8px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border2);
+  display: grid; place-items: center;
+}
+.scs-icon svg { width: 14px; height: 14px; }
+
+.scs-text {}
+.scs-label {
+  font-size: 12px; font-weight: 500; color: var(--text-dim);
+  letter-spacing: -0.01em; margin-bottom: 2px; line-height: 1.2;
+}
+.scs-desc { font-size: 10.5px; color: var(--text-muted); font-weight: 300; }
+
+/* Divider */
 .welcome-divider {
   width: 100%; height: 1px;
   background: linear-gradient(90deg, var(--gold-border), transparent);
@@ -263,16 +340,10 @@ header {
   cursor: pointer; font-family: var(--font-sans);
   transition: all 0.2s; -webkit-tap-highlight-color: transparent;
 }
-.quick-chip:hover {
-  border-color: var(--gold-border); color: var(--gold-light);
-  background: var(--gold-dim);
-}
+.quick-chip:hover { border-color: var(--gold-border); color: var(--gold-light); background: var(--gold-dim); }
 
 /* ── Messages ── */
-.message {
-  display: flex; gap: 11px;
-  animation: fadeUp 0.3s ease both; opacity: 0;
-}
+.message { display: flex; gap: 11px; animation: fadeUp 0.3s ease both; opacity: 0; }
 .message.user { flex-direction: row-reverse; }
 
 .avatar {
@@ -286,8 +357,7 @@ header {
 .message.bot .avatar svg { width: 17px; height: 17px; }
 .message.user .avatar {
   background: var(--navy-light); border: 1px solid var(--border2);
-  font-size: 11px; font-weight: 600; color: var(--text-dim);
-  letter-spacing: 0.02em;
+  font-size: 11px; font-weight: 600; color: var(--text-dim); letter-spacing: 0.02em;
 }
 
 .msg-body { display: flex; flex-direction: column; max-width: 80%; }
@@ -297,22 +367,17 @@ header {
 .bubble { padding: 13px 16px; font-size: 14px; line-height: 1.7; font-weight: 300; }
 .message.bot .bubble {
   background: var(--navy-card); border: 1px solid var(--border);
-  border-radius: 3px var(--radius) var(--radius) var(--radius);
-  color: var(--text);
+  border-radius: 3px var(--radius) var(--radius) var(--radius); color: var(--text);
 }
 .message.user .bubble {
-  background: linear-gradient(135deg, #1a2d52, #142242);
+  background: linear-gradient(135deg, #063a52, #042d40);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: var(--radius) 3px var(--radius) var(--radius);
   color: var(--text); font-weight: 400;
 }
 
-.msg-time {
-  font-size: 10px; color: var(--text-muted);
-  margin-top: 5px; padding: 0 3px; letter-spacing: 0.04em;
-}
+.msg-time { font-size: 10px; color: var(--text-muted); margin-top: 5px; padding: 0 3px; letter-spacing: 0.04em; }
 
-/* Actions */
 .msg-actions { display: flex; align-items: center; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
 .act-btn {
   background: var(--navy-card); border: 1px solid var(--border);
@@ -327,7 +392,6 @@ header {
 .act-btn.good   { color: #4ade80; border-color: rgba(74,222,128,0.25); }
 .act-btn.bad    { color: var(--danger); border-color: rgba(248,113,113,0.25); }
 
-/* Follow-ups */
 .followups { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
 .followup-chip {
   padding: 6px 12px; border-radius: 100px;
@@ -338,7 +402,6 @@ header {
 }
 .followup-chip:hover { border-color: var(--gold-border); color: var(--gold-light); background: var(--gold-dim); }
 
-/* Error */
 .error-bubble {
   background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.2);
   border-radius: 3px var(--radius) var(--radius) var(--radius);
@@ -353,7 +416,6 @@ header {
 }
 .retry-btn:hover { background: rgba(248,113,113,0.2); }
 
-/* Typing */
 .typing .bubble { display: flex; align-items: center; gap: 6px; padding: 18px 20px; }
 .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text-dim2); animation: bounce 1.2s ease infinite; }
 .dot:nth-child(2){animation-delay:.18s;} .dot:nth-child(3){animation-delay:.36s;}
@@ -378,7 +440,7 @@ header {
   flex-shrink: 0;
   padding: 10px 20px calc(env(safe-area-inset-bottom,0px) + 14px);
   border-top: 1px solid var(--border);
-  background: rgba(8,13,24,0.95);
+  background: rgba(3,15,24,0.96);
   backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
   animation: slideUp 0.7s 0.25s cubic-bezier(0.22,1,0.36,1) both; opacity:0;
 }
@@ -393,7 +455,7 @@ header {
 @media(min-width:560px){ .input-box { border-radius: 16px; padding: 10px 10px 10px 18px; } }
 .input-box:focus-within {
   border-color: var(--gold-border);
-  box-shadow: 0 0 0 3px rgba(201,168,76,0.07), 0 2px 16px rgba(0,0,0,0.3);
+  box-shadow: 0 0 0 3px rgba(45,212,191,0.08), 0 2px 16px rgba(0,0,0,0.3);
 }
 
 #userInput {
@@ -410,29 +472,22 @@ header {
   transition:all 0.18s; -webkit-tap-highlight-color:transparent;
 }
 #micBtn:hover { border-color:var(--gold-border); background:var(--gold-dim); }
-#micBtn.listening {
-  background:var(--gold-dim); border-color:var(--gold-border);
-  box-shadow:0 0 14px rgba(201,168,76,0.25); animation:pulse 1s ease infinite;
-}
+#micBtn.listening { background:var(--gold-dim); border-color:var(--gold-border); box-shadow:0 0 14px rgba(45,212,191,0.25); animation:pulse 1s ease infinite; }
 
 #sendBtn {
   width:36px; height:36px; min-width:36px; border-radius:9px;
-  background: linear-gradient(135deg, var(--gold), #a87c2a);
+  background: linear-gradient(135deg, #2dd4bf, #0e9a8a);
   border:none; cursor:pointer; display:grid; place-items:center; flex-shrink:0;
   transition:all 0.18s; -webkit-tap-highlight-color:transparent;
-  box-shadow: 0 2px 10px rgba(201,168,76,0.25);
+  box-shadow: 0 2px 10px rgba(45,212,191,0.28);
 }
-#sendBtn:hover { transform:scale(1.05); box-shadow:0 4px 16px rgba(201,168,76,0.35); }
+#sendBtn:hover { transform:scale(1.05); box-shadow:0 4px 16px rgba(45,212,191,0.4); }
 #sendBtn:active { transform:scale(0.96); }
 #sendBtn:disabled { background:var(--navy-light); box-shadow:none; cursor:not-allowed; transform:none; }
 
-.input-hint {
-  text-align:center; font-size:10.5px; color:var(--text-muted);
-  margin-top:8px; display:none; letter-spacing:0.04em; font-weight:300;
-}
+.input-hint { text-align:center; font-size:10.5px; color:var(--text-muted); margin-top:8px; display:none; letter-spacing:0.04em; font-weight:300; }
 @media(min-width:600px){ .input-hint{display:block;} }
 
-/* Toast */
 .toast {
   position:fixed; bottom:80px; left:50%;
   transform:translateX(-50%) translateY(14px);
@@ -445,7 +500,6 @@ header {
 }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-/* ── Animations ── */
 @keyframes slideDown { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
 @keyframes slideUp   { from{opacity:0;transform:translateY(14px)}  to{opacity:1;transform:translateY(0)} }
 @keyframes fadeUp    { from{opacity:0;transform:translateY(10px)}  to{opacity:1;transform:translateY(0)} }
@@ -460,10 +514,10 @@ header {
   <header>
     <div class="logo">
       <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="5" width="16" height="11" rx="3" stroke="#c9a84c" stroke-width="1.4"/>
-        <path d="M6 9h3M6 12h2" stroke="#c9a84c" stroke-width="1.4" stroke-linecap="round"/>
-        <rect x="13" y="9.5" width="2.5" height="2.5" rx="0.8" fill="#c9a84c" opacity="0.7"/>
-        <path d="M2 8h16" stroke="#c9a84c" stroke-width="1.2" opacity="0.4"/>
+        <rect x="2" y="5" width="16" height="11" rx="3" stroke="#2dd4bf" stroke-width="1.4"/>
+        <path d="M6 9h3M6 12h2" stroke="#2dd4bf" stroke-width="1.4" stroke-linecap="round"/>
+        <rect x="13" y="9.5" width="2.5" height="2.5" rx="0.8" fill="#2dd4bf" opacity="0.7"/>
+        <path d="M2 8h16" stroke="#2dd4bf" stroke-width="1.2" opacity="0.4"/>
       </svg>
     </div>
     <div class="header-divider"></div>
@@ -502,8 +556,7 @@ header {
     <div class="input-box">
       <textarea id="userInput" rows="1" placeholder="Ask about your banking needs…"></textarea>
       <button id="micBtn" onclick="toggleVoice()" title="Voice input">
-        <svg viewBox="0 0 18 18" fill="none" stroke="rgba(232,237,245,0.4)" stroke-width="1.6"
-             stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+        <svg viewBox="0 0 18 18" fill="none" stroke="rgba(232,237,245,0.4)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
           <rect x="6" y="1" width="6" height="9" rx="3"/>
           <path d="M3 8a6 6 0 0 0 12 0"/>
           <line x1="9" y1="17" x2="9" y2="14"/>
@@ -511,8 +564,7 @@ header {
         </svg>
       </button>
       <button id="sendBtn" onclick="sendMessage()">
-        <svg viewBox="0 0 18 18" fill="none" stroke="#0c1526" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+        <svg viewBox="0 0 18 18" fill="none" stroke="#03101a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
           <line x1="16" y1="2" x2="8" y2="10"/>
           <polygon points="16 2 11 16 8 10 2 7 16 2"/>
         </svg>
@@ -542,11 +594,15 @@ const I18N = {
     placeholder: 'How can we assist you today?',
     h2: 'Your trusted<br><span>banking partner</span>',
     sub: 'Get instant answers on accounts, loans, interest rates, fees, and all banking services.',
-    services: [
-      { icon: 'savings',  label: 'Savings Account', desc: 'Rates & features',   query: 'Tell me about savings account rates and benefits' },
-      { icon: 'loan',     label: 'Loan Services',   desc: 'Apply & eligibility', query: 'How do I apply for a loan and what are the requirements?' },
-      { icon: 'deposit',  label: 'Fixed Deposits',  desc: 'Interest & tenure',  query: 'What are the fixed deposit interest rates and tenure options?' },
-      { icon: 'card',     label: 'Credit Cards',    desc: 'Fees & rewards',     query: 'Tell me about credit card fees, rewards, and how to apply' },
+    primary_label: 'Popular Services',
+    secondary_label: 'More Options',
+    primary: [
+      { icon: 'savings', label: 'Savings Account', desc: 'Competitive rates & exclusive benefits tailored for you', query: 'Tell me about savings account rates and benefits' },
+      { icon: 'loan',    label: 'Loan Services',   desc: 'Quick approvals with flexible repayment options', query: 'How do I apply for a loan and what are the requirements?' },
+    ],
+    secondary: [
+      { icon: 'deposit', label: 'Fixed Deposits',  desc: 'Assured returns', query: 'What are the fixed deposit interest rates and tenure options?' },
+      { icon: 'card',    label: 'Credit Cards',    desc: 'Fees & rewards',  query: 'Tell me about credit card fees, rewards, and how to apply' },
     ],
     quick_label: 'Frequently Asked',
     quick: ['Minimum balance requirements', 'Reset PIN / password', 'Transfer limits & fees', 'Net banking setup', 'ATM withdrawal limit', 'Close my account'],
@@ -565,11 +621,15 @@ const I18N = {
     placeholder: 'आज हम आपकी कैसे सहायता कर सकते हैं?',
     h2: 'आपका विश्वसनीय<br><span>बैंकिंग साझेदार</span>',
     sub: 'खाते, लोन, ब्याज दर, शुल्क या किसी भी बैंकिंग सेवा के बारे में तत्काल उत्तर पाएं।',
-    services: [
-      { icon: 'savings', label: 'बचत खाता',     desc: 'दरें और विशेषताएं',   query: 'बचत खाते की ब्याज दर और लाभ बताएं' },
-      { icon: 'loan',    label: 'लोन सेवाएं',    desc: 'आवेदन और पात्रता',   query: 'लोन के लिए कैसे आवेदन करें?' },
-      { icon: 'deposit', label: 'फिक्स्ड डिपॉजिट', desc: 'ब्याज और अवधि',     query: 'फिक्स्ड डिपॉजिट की ब्याज दरें और अवधि?' },
-      { icon: 'card',    label: 'क्रेडिट कार्ड', desc: 'शुल्क और पुरस्कार',  query: 'क्रेडिट कार्ड के शुल्क और लाभ बताएं' },
+    primary_label: 'लोकप्रिय सेवाएं',
+    secondary_label: 'अन्य विकल्प',
+    primary: [
+      { icon: 'savings', label: 'बचत खाता',   desc: 'प्रतिस्पर्धी दरें और विशेष लाभ', query: 'बचत खाते की ब्याज दर और लाभ बताएं' },
+      { icon: 'loan',    label: 'लोन सेवाएं',  desc: 'त्वरित अनुमोदन और लचीला पुनर्भुगतान', query: 'लोन के लिए कैसे आवेदन करें?' },
+    ],
+    secondary: [
+      { icon: 'deposit', label: 'फिक्स्ड डिपॉजिट', desc: 'सुनिश्चित रिटर्न', query: 'फिक्स्ड डिपॉजिट की ब्याज दरें?' },
+      { icon: 'card',    label: 'क्रेडिट कार्ड',   desc: 'शुल्क और पुरस्कार',  query: 'क्रेडिट कार्ड के शुल्क और लाभ?' },
     ],
     quick_label: 'सामान्य प्रश्न',
     quick: ['न्यूनतम बैलेंस', 'पिन रीसेट', 'ट्रांसफर सीमा', 'नेट बैंकिंग', 'ATM लिमिट', 'खाता बंद करें'],
@@ -587,12 +647,14 @@ const I18N = {
 };
 
 const ICONS = {
-  savings: `<svg viewBox="0 0 16 16" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M2 9a6 6 0 1 1 10.4 4H2V9z"/><path d="M6 13v2M10 13v2"/><path d="M8 5v2M7 7h2"/></svg>`,
-  loan:    `<svg viewBox="0 0 16 16" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="1" y="4" width="14" height="9" rx="2"/><path d="M1 7h14"/><path d="M5 11h2M9 11h2"/></svg>`,
-  deposit: `<svg viewBox="0 0 16 16" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M8 1v10M5 8l3 3 3-3"/><path d="M2 13h12"/></svg>`,
-  card:    `<svg viewBox="0 0 16 16" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="1" y="3" width="14" height="10" rx="2"/><path d="M1 7h14"/><circle cx="4.5" cy="11" r="1" fill="#c9a84c" stroke="none"/></svg>`,
-  bot:     `<svg viewBox="0 0 20 20" fill="none" stroke="#c9a84c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><rect x="3" y="6" width="14" height="10" rx="3"/><path d="M10 2v4"/><circle cx="10" cy="2" r="1.2" fill="#c9a84c" stroke="none"/><circle cx="7" cy="11" r="1.2" fill="#c9a84c" stroke="none" opacity="0.7"/><circle cx="13" cy="11" r="1.2" fill="#c9a84c" stroke="none" opacity="0.7"/><path d="M7 15h6" stroke-opacity="0.6"/></svg>`,
+  savings: `<svg viewBox="0 0 16 16" fill="none" stroke="#2dd4bf" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M2 9a6 6 0 1 1 10.4 4H2V9z"/><path d="M6 13v2M10 13v2"/><path d="M8 5v2M7 7h2"/></svg>`,
+  loan:    `<svg viewBox="0 0 16 16" fill="none" stroke="#2dd4bf" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="1" y="4" width="14" height="9" rx="2"/><path d="M1 7h14"/><path d="M5 11h2M9 11h2"/></svg>`,
+  deposit: `<svg viewBox="0 0 16 16" fill="none" stroke="rgba(226,240,249,0.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M8 1v10M5 8l3 3 3-3"/><path d="M2 13h12"/></svg>`,
+  card:    `<svg viewBox="0 0 16 16" fill="none" stroke="rgba(226,240,249,0.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="1" y="3" width="14" height="10" rx="2"/><path d="M1 7h14"/><circle cx="4.5" cy="11" r="1" fill="rgba(226,240,249,0.35)" stroke="none"/></svg>`,
+  bot:     `<svg viewBox="0 0 20 20" fill="none" stroke="#2dd4bf" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><rect x="3" y="6" width="14" height="10" rx="3"/><path d="M10 2v4"/><circle cx="10" cy="2" r="1.2" fill="#2dd4bf" stroke="none"/><circle cx="7" cy="11" r="1.2" fill="#2dd4bf" stroke="none" opacity="0.7"/><circle cx="13" cy="11" r="1.2" fill="#2dd4bf" stroke="none" opacity="0.7"/><path d="M7 15h6" stroke-opacity="0.6"/></svg>`,
 };
+
+const ARROW_SVG = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11L11 3M5 3h6v6"/></svg>`;
 
 function t() { return I18N[lang]; }
 
@@ -606,8 +668,7 @@ function setLang(l) {
 }
 
 function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
+  const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2000);
 }
 function getTime() { return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
@@ -648,16 +709,11 @@ function addMessage(text, role, timeStr, silent) {
   if (welcome) welcome.remove();
 
   const msg = document.createElement('div'); msg.className=`message ${role}`;
-
   const av = document.createElement('div'); av.className='avatar';
-  if (role==='bot') av.innerHTML = ICONS.bot;
-  else av.textContent = 'U';
-
+  if (role==='bot') av.innerHTML = ICONS.bot; else av.textContent = 'U';
   const body = document.createElement('div'); body.className='msg-body';
   const bubble = document.createElement('div'); bubble.className='bubble';
-  const time = document.createElement('div'); time.className='msg-time';
-  time.textContent = timeStr || getTime();
-
+  const time = document.createElement('div'); time.className='msg-time'; time.textContent = timeStr || getTime();
   body.appendChild(bubble); body.appendChild(time);
   msg.appendChild(av); msg.appendChild(body);
   chatWrap.appendChild(msg);
@@ -695,9 +751,8 @@ function addBotActions(body, text) {
   if (chips.length) {
     const fu = document.createElement('div'); fu.className='followups';
     chips.forEach(c=>{
-      const btn=document.createElement('button'); btn.className='followup-chip';
-      btn.textContent=c; btn.onclick=()=>{ userInput.value=c; sendMessage(); };
-      fu.appendChild(btn);
+      const btn=document.createElement('button'); btn.className='followup-chip'; btn.textContent=c;
+      btn.onclick=()=>{ userInput.value=c; sendMessage(); }; fu.appendChild(btn);
     });
     body.appendChild(fu);
   }
@@ -795,7 +850,7 @@ userInput.addEventListener('keydown',(e)=>{
   if(e.key==='Escape')hideAutocomplete();
 });
 
-// Welcome
+// Welcome — rebuilt with hierarchy
 function renderWelcome() {
   const w=document.createElement('div'); w.className='welcome'; w.id='welcome'; w.style.opacity='1';
 
@@ -803,32 +858,62 @@ function renderWelcome() {
   const header=document.createElement('div'); header.className='welcome-header';
   const iconWrap=document.createElement('div'); iconWrap.className='welcome-icon-wrap';
   iconWrap.innerHTML=`<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="3" y="8" width="22" height="15" rx="4" stroke="#c9a84c" stroke-width="1.5"/>
-    <path d="M14 3v5" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/>
-    <circle cx="14" cy="2.5" r="1.5" fill="#c9a84c"/>
-    <path d="M3 12h22" stroke="#c9a84c" stroke-width="1.2" opacity="0.5"/>
-    <rect x="8" y="16" width="4" height="4" rx="1.5" fill="#c9a84c" opacity="0.7"/>
-    <rect x="16" y="16" width="4" height="4" rx="1.5" fill="#c9a84c" opacity="0.4"/>
+    <rect x="3" y="8" width="22" height="15" rx="4" stroke="#2dd4bf" stroke-width="1.5"/>
+    <path d="M14 3v5" stroke="#2dd4bf" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="14" cy="2.5" r="1.5" fill="#2dd4bf"/>
+    <path d="M3 12h22" stroke="#2dd4bf" stroke-width="1.2" opacity="0.5"/>
+    <rect x="8" y="16" width="4" height="4" rx="1.5" fill="#2dd4bf" opacity="0.7"/>
+    <rect x="16" y="16" width="4" height="4" rx="1.5" fill="#2dd4bf" opacity="0.4"/>
   </svg>`;
-
   const copy=document.createElement('div'); copy.className='welcome-copy';
   copy.innerHTML=`<h2>${t().h2}</h2><p>${t().sub}</p>`;
   header.appendChild(iconWrap); header.appendChild(copy);
   w.appendChild(header);
 
-  // Service cards
-  const grid=document.createElement('div'); grid.className='services-row';
-  t().services.forEach(svc=>{
-    const card=document.createElement('div'); card.className='service-card';
+  // Services section
+  const section=document.createElement('div'); section.className='services-section';
+
+  // Primary tier label
+  const pl=document.createElement('div'); pl.className='tier-label primary'; pl.textContent=t().primary_label;
+  section.appendChild(pl);
+
+  // Primary cards (Savings + Loan) — large, highlighted
+  const primaryRow=document.createElement('div'); primaryRow.className='primary-row';
+  t().primary.forEach(svc=>{
+    const card=document.createElement('div'); card.className='service-card-primary';
     card.innerHTML=`
-      <div class="sc-icon">${ICONS[svc.icon]}</div>
-      <div class="sc-label">${svc.label}</div>
-      <div class="sc-desc">${svc.desc}</div>
+      <div class="scp-badge">★ Featured</div>
+      <div class="scp-icon">${ICONS[svc.icon]}</div>
+      <div class="scp-label">${svc.label}</div>
+      <div class="scp-desc">${svc.desc}</div>
+      <div class="scp-arrow">${ARROW_SVG}</div>
     `;
-    card.onclick=()=>{userInput.value=svc.query;sendMessage();};
-    grid.appendChild(card);
+    card.onclick=()=>{ userInput.value=svc.query; sendMessage(); };
+    primaryRow.appendChild(card);
   });
-  w.appendChild(grid);
+  section.appendChild(primaryRow);
+
+  // Secondary tier label
+  const sl=document.createElement('div'); sl.className='tier-label secondary'; sl.textContent=t().secondary_label;
+  sl.style.marginTop='14px';
+  section.appendChild(sl);
+
+  // Secondary cards (FD + Credit Card) — compact, muted
+  const secondaryRow=document.createElement('div'); secondaryRow.className='secondary-row';
+  t().secondary.forEach(svc=>{
+    const card=document.createElement('div'); card.className='service-card-secondary';
+    card.innerHTML=`
+      <div class="scs-icon">${ICONS[svc.icon]}</div>
+      <div class="scs-text">
+        <div class="scs-label">${svc.label}</div>
+        <div class="scs-desc">${svc.desc}</div>
+      </div>
+    `;
+    card.onclick=()=>{ userInput.value=svc.query; sendMessage(); };
+    secondaryRow.appendChild(card);
+  });
+  section.appendChild(secondaryRow);
+  w.appendChild(section);
 
   // Divider
   const div=document.createElement('div'); div.className='welcome-divider';
@@ -840,12 +925,11 @@ function renderWelcome() {
   const qc=document.createElement('div'); qc.className='quick-chips';
   t().quick.forEach(s=>{
     const btn=document.createElement('button'); btn.className='quick-chip'; btn.textContent=s;
-    btn.onclick=()=>{userInput.value=s;sendMessage();};
-    qc.appendChild(btn);
+    btn.onclick=()=>{ userInput.value=s; sendMessage(); }; qc.appendChild(btn);
   });
   w.appendChild(qc);
 
-  chatWrap.insertBefore(w,chatWrap.firstChild);
+  chatWrap.insertBefore(w, chatWrap.firstChild);
 }
 
 function clearChat() {
