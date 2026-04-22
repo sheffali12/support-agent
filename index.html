@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>NBS — Banking Assistant</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<!-- ✅ ADDED: Markdown parser -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -192,7 +194,6 @@ header {
 /* ── SERVICE HIERARCHY LAYOUT ── */
 .services-section { margin-bottom: 22px; }
 
-/* Primary tier label */
 .tier-label {
   font-size: 9.5px; font-weight: 600; letter-spacing: 0.12em;
   text-transform: uppercase; margin-bottom: 9px;
@@ -207,7 +208,6 @@ header {
 .tier-label.primary::after { background: linear-gradient(90deg, var(--gold-border), transparent); }
 .tier-label.secondary::after { background: linear-gradient(90deg, var(--border), transparent); }
 
-/* Primary row — 2 large cards side by side */
 .primary-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -216,7 +216,6 @@ header {
 }
 @media(min-width:480px){ .primary-row { gap: 12px; } }
 
-/* Primary card — larger, highlighted */
 .service-card-primary {
   background: linear-gradient(145deg, #052235, #041a2a);
   border: 1px solid var(--gold-border);
@@ -278,7 +277,6 @@ header {
 }
 .service-card-primary:hover .scp-arrow { opacity: 1; transform: translate(2px, -2px); }
 
-/* Secondary row — 2 smaller cards */
 .secondary-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -286,7 +284,6 @@ header {
 }
 @media(min-width:480px){ .secondary-row { gap: 10px; } }
 
-/* Secondary card — smaller, muted */
 .service-card-secondary {
   background: var(--navy-card);
   border: 1px solid var(--border);
@@ -313,21 +310,18 @@ header {
 }
 .scs-icon svg { width: 14px; height: 14px; }
 
-.scs-text {}
 .scs-label {
   font-size: 12px; font-weight: 500; color: var(--text-dim);
   letter-spacing: -0.01em; margin-bottom: 2px; line-height: 1.2;
 }
 .scs-desc { font-size: 10.5px; color: var(--text-muted); font-weight: 300; }
 
-/* Divider */
 .welcome-divider {
   width: 100%; height: 1px;
   background: linear-gradient(90deg, var(--gold-border), transparent);
   margin-bottom: 18px;
 }
 
-/* Quick prompts */
 .quick-label {
   font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
   text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px;
@@ -374,6 +368,42 @@ header {
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: var(--radius) 3px var(--radius) var(--radius);
   color: var(--text); font-weight: 400;
+}
+
+/* ✅ ADDED: Markdown rendering styles */
+.message.bot .bubble h1,
+.message.bot .bubble h2,
+.message.bot .bubble h3 {
+  font-family: var(--font-serif);
+  color: var(--gold-light);
+  margin: 10px 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.message.bot .bubble strong {
+  color: var(--gold-light);
+  font-weight: 600;
+}
+.message.bot .bubble ul,
+.message.bot .bubble ol {
+  padding-left: 18px;
+  margin: 6px 0;
+}
+.message.bot .bubble li {
+  margin-bottom: 5px;
+  line-height: 1.6;
+  color: var(--text);
+}
+.message.bot .bubble p {
+  margin-bottom: 8px;
+}
+.message.bot .bubble p:last-child {
+  margin-bottom: 0;
+}
+.message.bot .bubble hr {
+  border: none;
+  border-top: 1px solid var(--border2);
+  margin: 10px 0;
 }
 
 .msg-time { font-size: 10px; color: var(--text-muted); margin-top: 5px; padding: 0 3px; letter-spacing: 0.04em; }
@@ -677,7 +707,7 @@ function saveHistory() {
   const msgs = [];
   chatWrap.querySelectorAll('.message').forEach(m => {
     const role = m.classList.contains('user') ? 'user' : 'bot';
-    const text = m.querySelector('.bubble')?.textContent || '';
+    const text = m.querySelector('.bubble')?.dataset.raw || m.querySelector('.bubble')?.textContent || '';
     const time = m.querySelector('.msg-time')?.textContent || '';
     if (text) msgs.push({role,text,time});
   });
@@ -704,6 +734,7 @@ function getFollowups(text) {
   return fu.default;
 }
 
+// ✅ UPDATED: addMessage with markdown rendering
 function addMessage(text, role, timeStr, silent) {
   const welcome = document.getElementById('welcome');
   if (welcome) welcome.remove();
@@ -713,6 +744,7 @@ function addMessage(text, role, timeStr, silent) {
   if (role==='bot') av.innerHTML = ICONS.bot; else av.textContent = 'U';
   const body = document.createElement('div'); body.className='msg-body';
   const bubble = document.createElement('div'); bubble.className='bubble';
+  bubble.dataset.raw = text; // store raw text for copy & history
   const time = document.createElement('div'); time.className='msg-time'; time.textContent = timeStr || getTime();
   body.appendChild(bubble); body.appendChild(time);
   msg.appendChild(av); msg.appendChild(body);
@@ -720,20 +752,29 @@ function addMessage(text, role, timeStr, silent) {
   requestAnimationFrame(() => { msg.style.opacity='1'; });
 
   if (role==='bot') {
-    if (silent) { bubble.textContent=text; addBotActions(body,text); }
-    else {
-      let i=0;
-      const iv = setInterval(()=>{
-        bubble.textContent+=text[i]; i++;
-        chatWrap.scrollTop=chatWrap.scrollHeight;
-        if(i>=text.length){ clearInterval(iv); addBotActions(body,text); saveHistory(); }
-      },14);
+    if (silent) {
+      bubble.innerHTML = marked.parse(text); // ✅ render markdown
+      addBotActions(body, text);
+    } else {
+      // Stream chars, then render markdown at the end
+      let i = 0;
+      bubble.textContent = '';
+      const iv = setInterval(() => {
+        i++;
+        chatWrap.scrollTop = chatWrap.scrollHeight;
+        if (i >= text.length) {
+          clearInterval(iv);
+          bubble.innerHTML = marked.parse(text); // ✅ render markdown when streaming done
+          addBotActions(body, text);
+          saveHistory();
+        }
+      }, 14);
     }
   } else {
-    bubble.textContent=text;
-    if(!silent) saveHistory();
+    bubble.textContent = text;
+    if (!silent) saveHistory();
   }
-  chatWrap.scrollTop=chatWrap.scrollHeight;
+  chatWrap.scrollTop = chatWrap.scrollHeight;
 }
 
 function addBotActions(body, text) {
@@ -850,11 +891,10 @@ userInput.addEventListener('keydown',(e)=>{
   if(e.key==='Escape')hideAutocomplete();
 });
 
-// Welcome — rebuilt with hierarchy
+// Welcome
 function renderWelcome() {
   const w=document.createElement('div'); w.className='welcome'; w.id='welcome'; w.style.opacity='1';
 
-  // Hero
   const header=document.createElement('div'); header.className='welcome-header';
   const iconWrap=document.createElement('div'); iconWrap.className='welcome-icon-wrap';
   iconWrap.innerHTML=`<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -870,14 +910,11 @@ function renderWelcome() {
   header.appendChild(iconWrap); header.appendChild(copy);
   w.appendChild(header);
 
-  // Services section
   const section=document.createElement('div'); section.className='services-section';
 
-  // Primary tier label
   const pl=document.createElement('div'); pl.className='tier-label primary'; pl.textContent=t().primary_label;
   section.appendChild(pl);
 
-  // Primary cards (Savings + Loan) — large, highlighted
   const primaryRow=document.createElement('div'); primaryRow.className='primary-row';
   t().primary.forEach(svc=>{
     const card=document.createElement('div'); card.className='service-card-primary';
@@ -893,12 +930,10 @@ function renderWelcome() {
   });
   section.appendChild(primaryRow);
 
-  // Secondary tier label
   const sl=document.createElement('div'); sl.className='tier-label secondary'; sl.textContent=t().secondary_label;
   sl.style.marginTop='14px';
   section.appendChild(sl);
 
-  // Secondary cards (FD + Credit Card) — compact, muted
   const secondaryRow=document.createElement('div'); secondaryRow.className='secondary-row';
   t().secondary.forEach(svc=>{
     const card=document.createElement('div'); card.className='service-card-secondary';
@@ -915,11 +950,9 @@ function renderWelcome() {
   section.appendChild(secondaryRow);
   w.appendChild(section);
 
-  // Divider
   const div=document.createElement('div'); div.className='welcome-divider';
   w.appendChild(div);
 
-  // Quick chips
   const ql=document.createElement('div'); ql.className='quick-label'; ql.textContent=t().quick_label;
   w.appendChild(ql);
   const qc=document.createElement('div'); qc.className='quick-chips';
