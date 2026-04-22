@@ -829,10 +829,17 @@ function removeTyping(){ const t=document.getElementById('typing'); if(t) t.remo
 async function callAPI(text) {
   addTyping();
   try {
-    const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:text,session_id:sessionId})});
-    const data=await res.json(); removeTyping();
-    addMessage(data.answer||'Sorry, I could not get a response.','bot');
-  } catch(err){ removeTyping(); addErrorBubble(text); }
+    const res = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question:text, session_id:sessionId})});
+    const data = await res.json();
+    removeTyping();
+    if (data.data && data.data.summary) {
+      const r = data.data;
+      const formatted = `**Summary:** ${r.summary}\n\n**Details:**\n${r.details.map(d=>'- '+d).join('\n')}\n\n**Next Steps:**\n${r.next_steps.map(s=>'- '+s).join('\n')}`;
+      addMessage(formatted, 'bot');
+    } else {
+      addMessage(data.data?.error || 'Sorry, I could not get a response.', 'bot');
+    }
+  } catch(err) { removeTyping(); addErrorBubble(text); }
   sendBtn.disabled=false; userInput.focus();
 }
 
