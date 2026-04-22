@@ -13,7 +13,6 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.chat_history import InMemoryChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.output_parsers import PydanticOutputParser
-# Fixed import for standard chains
 from langchain_classic.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from contextlib import asynccontextmanager
@@ -32,7 +31,7 @@ class SupportAgent:
     def __init__(self, pdf_path):
         self.pdf_path = pdf_path
         self.store = {}
-        # Lower temperature to 0.0 for stricter formatting adherence
+        # Temperature 0.0 is critical for structured JSON
         self.llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0.0)
         self.embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
         self.parser = PydanticOutputParser(pydantic_object=StructuredResponse)
@@ -44,9 +43,12 @@ class SupportAgent:
         if os.path.exists(persist_dir):
             return Chroma(persist_directory=persist_dir, embedding_function=self.embeddings)
         
+        if not os.path.exists(self.pdf_path):
+            print(f"Warning: {self.pdf_path} not found. Creating empty vector store.")
+            return Chroma(embedding_function=self.embeddings, persist_directory=persist_dir)
+
         loader = PyPDFLoader(self.pdf_path)
         data = loader.load()
-        # Slightly smaller chunks for more precise retrieval
         splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=80)
         chunks = splitter.split_documents(data)
         return Chroma.from_documents(
@@ -66,17 +68,12 @@ class SupportAgent:
         
         history_aware_retriever = create_history_aware_retriever(self.llm, retriever, contextualize_prompt)
 
-        # Added format_instructions to the prompt
         qa_prompt = ChatPromptTemplate.from_messages([
-            ("system", """You are a helpful support assistant. Use the provided context to answer the user's question.
+            ("system", """You are a helpful banking support assistant. 
+            Use the context to answer the question. You MUST follow the JSON format instructions strictly.
             
             {format_instructions}
             
-            If the answer is not in the context, use the following:
-            Summary: I'm sorry, I don't have that information.
-            Details: ["This topic isn't in my current database."]
-            Next Steps: ["Please contact human support."]
-
             Context: {context}"""),
             MessagesPlaceholder("chat_history"),
             ("human", "{input}"),
@@ -104,10 +101,13 @@ class SupportAgent:
                 {"input": query},
                 config={"configurable": {"session_id": session_id}}
             )
-            # The 'answer' is now a string that needs to be parsed into our Pydantic model
-            return self.parser.parse(result["answer"])
+            # result["answer"] is a string. We parse it into a Pydantic object.
+            parsed_data = self.parser.parse(result["answer"])
+            # .model_dump() converts the object into a dictionary for JSON response
+            return parsed_data.model_dump()
         except Exception as e:
-            return {"error": str(e)}
+            print(f"Logic Error: {e}")
+            return {"error": "Failed to parse AI response. Please try again."}
 
 # --- 3. FASTAPI ---
 agent = None
@@ -115,6 +115,7 @@ agent = None
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global agent
+    # Ensure this PDF exists in your directory!
     agent = SupportAgent("company_handbook.pdf")
     yield
 
@@ -137,7 +138,6 @@ async def chat(request: ChatRequest):
     if not agent:
         raise HTTPException(status_code=503, detail="Agent not initialized")
     
-    # This now returns a dictionary/JSON object instead of just a string
     response = agent.ask(request.question, request.session_id)
     return {"data": response}
 
