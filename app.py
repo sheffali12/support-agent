@@ -15,7 +15,9 @@ from langchain_classic.chains import create_history_aware_retriever, create_retr
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from contextlib import asynccontextmanager
 import uvicorn
+
 load_dotenv()
+
 # --- 1. CORE LOGIC ---
 class SupportAgent:
     def __init__(self, pdf_path):
@@ -25,6 +27,7 @@ class SupportAgent:
         self.embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
         self.vector_db = self._setup_knowledge_base()
         self.chain = self._setup_chain()
+
     def _setup_knowledge_base(self):
         persist_dir = "./chroma_db"
         if os.path.exists(persist_dir):
@@ -40,21 +43,45 @@ class SupportAgent:
             embedding=self.embeddings,
             persist_directory=persist_dir
         )
+
     def _setup_chain(self):
         retriever = self.vector_db.as_retriever(search_kwargs={"k": 3})
+
         contextualize_prompt = ChatPromptTemplate.from_messages([
             ("system", "Given the chat history, reformulate the user question to be standalone."),
             MessagesPlaceholder("chat_history"),
             ("human", "{input}"),
         ])
         history_aware_retriever = create_history_aware_retriever(self.llm, retriever, contextualize_prompt)
+
+        # ✅ UPDATED: Structured response prompt
         qa_prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are a helpful support assistant. Use the context below to answer.\n\nContext: {context}"),
+            ("system", """You are a helpful support assistant. Use the context below to answer.
+
+Always structure your response EXACTLY like this:
+
+**Summary:** <one sentence answer>
+
+**Details:**
+- <point 1>
+- <point 2>
+- <point 3 if needed>
+
+**Next Steps:** <what the user should do next, if applicable>
+
+If the answer is not found in the context, respond with:
+**Summary:** I don't have information on that.
+**Details:** This topic isn't covered in the available documentation.
+**Next Steps:** Please contact support for further assistance.
+
+Context: {context}"""),
             MessagesPlaceholder("chat_history"),
             ("human", "{input}"),
         ])
+
         qa_chain = create_stuff_documents_chain(self.llm, qa_prompt)
         rag_chain = create_retrieval_chain(history_aware_retriever, qa_chain)
+
         return RunnableWithMessageHistory(
             rag_chain,
             self._get_session_history,
@@ -62,10 +89,12 @@ class SupportAgent:
             history_messages_key="chat_history",
             output_messages_key="answer",
         )
+
     def _get_session_history(self, session_id: str):
         if session_id not in self.store:
             self.store[session_id] = InMemoryChatMessageHistory()
         return self.store[session_id]
+
     def ask(self, query, session_id="default"):
         try:
             result = self.chain.invoke(
@@ -76,14 +105,18 @@ class SupportAgent:
         except Exception as e:
             return f"Error: {str(e)}"
 
+
 # --- 2. FASTAPI ---
-agent = None  # ← declare global first
+agent = None
+
 @asynccontextmanager
-async def lifespan(app: FastAPI):  # ← defined ONCE
+async def lifespan(app: FastAPI):
     global agent
     agent = SupportAgent("company_handbook.pdf")
     yield
-app = FastAPI(title="AI Support Agent API", lifespan=lifespan)  # ← defined ONCE
+
+app = FastAPI(title="AI Support Agent API", lifespan=lifespan)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -91,18 +124,22 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 class ChatRequest(BaseModel):
     question: str
     session_id: str = "default"
+
 @app.get("/")
 def home():
     return {"status": "Online", "message": "Support Agent is ready."}
+
 @app.post("/chat")
 async def chat(request: ChatRequest):
     if not agent:
         raise HTTPException(status_code=503, detail="Agent not initialized")
     response = agent.ask(request.question, request.session_id)
     return {"answer": response}
+
 
 # --- 3. RUNNER ---
 if __name__ == "__main__":
