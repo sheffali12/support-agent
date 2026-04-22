@@ -54,25 +54,32 @@ class SupportAgent:
         ])
         history_aware_retriever = create_history_aware_retriever(self.llm, retriever, contextualize_prompt)
 
-        # ✅ UPDATED: Structured response prompt
         qa_prompt = ChatPromptTemplate.from_messages([
             ("system", """You are a helpful support assistant. Use the context below to answer.
 
 Always structure your response EXACTLY like this:
 
-**Summary:** <one sentence answer>
+ <one sentence answer>
 
-**Details:**
+Details:
 - <point 1>
 - <point 2>
 - <point 3 if needed>
 
-**Next Steps:** <what the user should do next, if applicable>
+**Next Steps:**
+- <step 1>
+- <step 2>
 
-If the answer is not found in the context, respond with:
-**Summary:** I don't have information on that.
-**Details:** This topic isn't covered in the available documentation.
-**Next Steps:** Please contact support for further assistance.
+IMPORTANT RULES:
+- Always use bullet points, never write long paragraphs
+- Each bullet point should be one clear sentence
+- Minimum 2 bullet points in Details, maximum 5
+- If answer is not in context, respond with:
+  **Summary:** I don't have information on that.
+  **Details:**
+  - This topic isn't covered in the available documentation.
+  **Next Steps:**
+  - Please contact support for further assistance.
 
 Context: {context}"""),
             MessagesPlaceholder("chat_history"),
