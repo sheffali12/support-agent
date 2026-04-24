@@ -547,8 +547,8 @@ const STORAGE_KEY = 'nbs_pro_v2';
 // ── Language state ──────────────────────────────────────────────────────────
 // langMode: 'auto' | 'manual'
 // lang: 'en' | 'hi'  (current active language for UI)
-let langMode = localStorage.getItem('nbs_lang_mode') || 'auto';
-let lang     = localStorage.getItem('nbs_lang') || 'en';
+let langMode = sessionStorage.getItem('nbs_lang_mode') || 'auto';
+let lang     = sessionStorage.getItem('nbs_lang') || 'en';
 
 // Track current TTS audio so we can stop it
 let currentAudio = null;
@@ -629,8 +629,8 @@ function t() { return I18N[lang]; }
 function applyLang(newLang, mode) {
   lang     = newLang;
   langMode = mode;
-  localStorage.setItem('nbs_lang', lang);
-  localStorage.setItem('nbs_lang_mode', langMode);
+  sessionStorage.setItem('nbs_lang', lang);
+  sessionStorage.setItem('nbs_lang_mode', langMode);
 
   document.getElementById('btnEn').classList.toggle('active', lang === 'en');
   document.getElementById('btnHi').classList.toggle('active', lang === 'hi');
@@ -762,12 +762,12 @@ function saveHistory() {
     const time = m.querySelector('.msg-time')?.textContent || '';
     if (text) msgs.push({role,text,time});
   });
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(msgs)); } catch(e){}
+  try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(msgs)); } catch(e){}
 }
 
 function loadHistory() {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = sessionStorage.getItem(STORAGE_KEY);
     if (!saved) return false;
     const msgs = JSON.parse(saved);
     if (!msgs.length) return false;
@@ -1068,7 +1068,7 @@ function renderWelcome() {
 
 function clearChat() {
   chatWrap.innerHTML = '';
-  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  try { sessionStorage.removeItem(STORAGE_KEY); } catch(e) {}
   renderWelcome();
 }
 
