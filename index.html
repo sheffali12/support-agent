@@ -5,44 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>NBS — Banking Assistant</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<!-- ✅ ADDED: Markdown parser -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --navy-deep:   #030f18;
-  --navy:        #051525;
-  --navy-mid:    #071d30;
-  --navy-light:  #0a2540;
-  --navy-card:   #061a2d;
-  --navy-hover:  #0b2438;
-
-  --gold:        #2dd4bf;
-  --gold-light:  #5eead4;
-  --gold-dim:    rgba(45,212,191,0.12);
+  --navy-deep: #030f18;
+  --navy: #051525;
+  --navy-mid: #071d30;
+  --navy-light: #0a2540;
+  --navy-card: #061a2d;
+  --navy-hover: #0b2438;
+  --gold: #2dd4bf;
+  --gold-light: #5eead4;
+  --gold-dim: rgba(45,212,191,0.12);
   --gold-border: rgba(45,212,191,0.22);
-
-  --accent2:     #38bdf8;
+  --accent2: #38bdf8;
   --accent2-dim: rgba(56,189,248,0.10);
-
-  --border:      rgba(255,255,255,0.06);
-  --border2:     rgba(255,255,255,0.10);
-
-  --text:        #e2f0f9;
-  --text-dim:    rgba(226,240,249,0.50);
-  --text-dim2:   rgba(226,240,249,0.28);
-  --text-muted:  rgba(226,240,249,0.18);
-
-  --success:     #4ade80;
-  --danger:      #f87171;
-
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.10);
+  --text: #e2f0f9;
+  --text-dim: rgba(226,240,249,0.50);
+  --text-dim2: rgba(226,240,249,0.28);
+  --text-muted: rgba(226,240,249,0.18);
+  --success: #4ade80;
+  --danger: #f87171;
   --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans:  'Outfit', sans-serif;
-  --radius:     16px;
-  --radius-sm:  10px;
+  --font-sans: 'Outfit', sans-serif;
+  --radius: 16px;
+  --radius-sm: 10px;
 }
-
 html, body {
   height: 100%;
   background: var(--navy-deep);
@@ -58,7 +49,6 @@ body {
   min-height: 100dvh;
   overflow: hidden;
 }
-
 body::before {
   content: '';
   position: fixed; inset: 0; pointer-events: none; z-index: 0;
@@ -72,7 +62,6 @@ body::after {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
   opacity: 0.022;
 }
-
 .shell {
   position: relative; z-index: 2;
   width: 100%; max-width: 820px;
@@ -93,7 +82,6 @@ header {
   animation: slideDown 0.7s cubic-bezier(0.22,1,0.36,1) both;
 }
 @media(min-width:560px){ header { padding: 0 28px; height: 66px; } }
-
 .logo {
   width: 38px; height: 38px; border-radius: 10px;
   border: 1px solid var(--gold-border);
@@ -101,9 +89,7 @@ header {
   display: grid; place-items: center; flex-shrink: 0;
 }
 .logo svg { width: 20px; height: 20px; }
-
 .header-divider { width: 1px; height: 24px; background: var(--border2); flex-shrink: 0; }
-
 .brand { flex: 1; min-width: 0; }
 .brand-name {
   font-family: var(--font-serif); font-size: 16px; font-weight: 500;
@@ -115,13 +101,14 @@ header {
   letter-spacing: 0.06em; text-transform: uppercase; font-weight: 400;
 }
 @media(min-width:480px){ .brand-name { font-size: 17px; } }
-
 .header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
+/* ── Language toggle ── */
 .lang-toggle {
   display: flex; align-items: center;
   background: var(--navy-card); border: 1px solid var(--border2);
   border-radius: 8px; overflow: hidden; flex-shrink: 0;
+  position: relative;
 }
 .lang-btn {
   font-size: 11px; font-weight: 500; font-family: var(--font-sans);
@@ -129,8 +116,17 @@ header {
   padding: 6px 10px; cursor: pointer; transition: all 0.2s;
   letter-spacing: 0.03em;
 }
-.lang-btn.active { background: var(--gold-dim); color: var(--gold-light); border-right: 1px solid var(--gold-border); }
-.lang-btn:last-child.active { border-right: none; border-left: 1px solid var(--gold-border); }
+.lang-btn.active { background: var(--gold-dim); color: var(--gold-light); }
+
+/* NEW: auto-detect indicator dot */
+.lang-auto-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--gold);
+  position: absolute; top: 4px; right: 4px;
+  display: none;
+  animation: pulse 2s ease infinite;
+}
+.lang-auto-dot.visible { display: block; }
 
 .status-badge {
   display: flex; align-items: center; gap: 5px;
@@ -139,7 +135,6 @@ header {
   font-size: 11px; font-weight: 500; color: #4ade80; letter-spacing: 0.02em;
 }
 .status-pulse { width: 5px; height: 5px; border-radius: 50%; background: #4ade80; animation: pulse 2.2s ease infinite; }
-
 .icon-btn {
   width: 34px; height: 34px; border-radius: 8px;
   background: var(--navy-card); border: 1px solid var(--border2);
@@ -165,7 +160,6 @@ header {
   animation: fadeUp 0.8s 0.2s cubic-bezier(0.22,1,0.36,1) both;
   opacity: 0;
 }
-
 .welcome-header {
   display: flex; align-items: flex-start; gap: 16px;
   padding: 4px 0 24px;
@@ -191,9 +185,8 @@ header {
   font-size: 14px; color: var(--text-dim); line-height: 1.65; max-width: 440px; font-weight: 300;
 }
 
-/* ── SERVICE HIERARCHY LAYOUT ── */
+/* ── Service cards ── */
 .services-section { margin-bottom: 22px; }
-
 .tier-label {
   font-size: 9.5px; font-weight: 600; letter-spacing: 0.12em;
   text-transform: uppercase; margin-bottom: 9px;
@@ -201,39 +194,26 @@ header {
 }
 .tier-label.primary { color: var(--gold); }
 .tier-label.secondary { color: var(--text-muted); }
-.tier-label::after {
-  content: '';
-  flex: 1; height: 1px;
-}
+.tier-label::after { content: ''; flex: 1; height: 1px; }
 .tier-label.primary::after { background: linear-gradient(90deg, var(--gold-border), transparent); }
 .tier-label.secondary::after { background: linear-gradient(90deg, var(--border), transparent); }
-
 .primary-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 8px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;
 }
 @media(min-width:480px){ .primary-row { gap: 12px; } }
-
 .service-card-primary {
   background: linear-gradient(145deg, #052235, #041a2a);
   border: 1px solid var(--gold-border);
-  border-radius: var(--radius);
-  padding: 20px 16px;
-  cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
-  -webkit-tap-highlight-color: transparent;
-  position: relative; overflow: hidden;
+  border-radius: var(--radius); padding: 20px 16px;
+  cursor: pointer; transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
+  -webkit-tap-highlight-color: transparent; position: relative; overflow: hidden;
 }
 .service-card-primary::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
   background: linear-gradient(90deg, transparent, rgba(45,212,191,0.5), transparent);
 }
 .service-card-primary::after {
-  content: '';
-  position: absolute; bottom: 0; right: 0;
+  content: ''; position: absolute; bottom: 0; right: 0;
   width: 80px; height: 80px;
   background: radial-gradient(circle, rgba(45,212,191,0.08) 0%, transparent 70%);
   pointer-events: none;
@@ -245,16 +225,13 @@ header {
   box-shadow: 0 10px 32px rgba(0,0,0,0.35), 0 0 0 1px rgba(45,212,191,0.1);
 }
 .service-card-primary:active { transform: scale(0.98); }
-
 .scp-badge {
   display: inline-flex; align-items: center; gap: 4px;
   background: var(--gold-dim); border: 1px solid var(--gold-border);
   border-radius: 100px; padding: 2px 8px;
   font-size: 9px; font-weight: 600; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--gold-light);
-  margin-bottom: 10px;
+  text-transform: uppercase; color: var(--gold-light); margin-bottom: 10px;
 }
-
 .scp-icon {
   width: 36px; height: 36px; border-radius: 10px;
   background: linear-gradient(135deg, rgba(45,212,191,0.2), rgba(45,212,191,0.06));
@@ -262,70 +239,35 @@ header {
   display: grid; place-items: center; margin-bottom: 12px;
 }
 .scp-icon svg { width: 18px; height: 18px; }
-
-.scp-label {
-  font-size: 14px; font-weight: 600; color: var(--text);
-  letter-spacing: -0.01em; margin-bottom: 4px; line-height: 1.2;
-}
-.scp-desc {
-  font-size: 11.5px; color: var(--text-dim); font-weight: 300; line-height: 1.5;
-}
-.scp-arrow {
-  position: absolute; bottom: 14px; right: 14px;
-  color: var(--gold); opacity: 0.5;
-  transition: all 0.2s;
-}
+.scp-label { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; margin-bottom: 4px; line-height: 1.2; }
+.scp-desc { font-size: 11.5px; color: var(--text-dim); font-weight: 300; line-height: 1.5; }
+.scp-arrow { position: absolute; bottom: 14px; right: 14px; color: var(--gold); opacity: 0.5; transition: all 0.2s; }
 .service-card-primary:hover .scp-arrow { opacity: 1; transform: translate(2px, -2px); }
-
-.secondary-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
+.secondary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 @media(min-width:480px){ .secondary-row { gap: 10px; } }
-
 .service-card-secondary {
-  background: var(--navy-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 13px 13px;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.22,1,0.36,1);
+  background: var(--navy-card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 13px 13px;
+  cursor: pointer; transition: all 0.2s cubic-bezier(0.22,1,0.36,1);
   -webkit-tap-highlight-color: transparent;
   display: flex; align-items: center; gap: 11px;
   position: relative; overflow: hidden;
 }
 .service-card-secondary:hover {
-  background: var(--navy-hover);
-  border-color: var(--border2);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  background: var(--navy-hover); border-color: var(--border2);
+  transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.25);
 }
 .service-card-secondary:active { transform: scale(0.98); }
-
 .scs-icon {
   width: 28px; height: 28px; min-width: 28px; border-radius: 8px;
   background: rgba(255,255,255,0.04); border: 1px solid var(--border2);
   display: grid; place-items: center;
 }
 .scs-icon svg { width: 14px; height: 14px; }
-
-.scs-label {
-  font-size: 12px; font-weight: 500; color: var(--text-dim);
-  letter-spacing: -0.01em; margin-bottom: 2px; line-height: 1.2;
-}
+.scs-label { font-size: 12px; font-weight: 500; color: var(--text-dim); letter-spacing: -0.01em; margin-bottom: 2px; line-height: 1.2; }
 .scs-desc { font-size: 10.5px; color: var(--text-muted); font-weight: 300; }
-
-.welcome-divider {
-  width: 100%; height: 1px;
-  background: linear-gradient(90deg, var(--gold-border), transparent);
-  margin-bottom: 18px;
-}
-
-.quick-label {
-  font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px;
-}
+.welcome-divider { width: 100%; height: 1px; background: linear-gradient(90deg, var(--gold-border), transparent); margin-bottom: 18px; }
+.quick-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
 .quick-chips { display: flex; flex-wrap: wrap; gap: 7px; }
 .quick-chip {
   padding: 7px 14px; border-radius: 100px;
@@ -339,7 +281,6 @@ header {
 /* ── Messages ── */
 .message { display: flex; gap: 11px; animation: fadeUp 0.3s ease both; opacity: 0; }
 .message.user { flex-direction: row-reverse; }
-
 .avatar {
   width: 32px; height: 32px; border-radius: 9px;
   flex-shrink: 0; display: grid; place-items: center; margin-top: 1px;
@@ -353,11 +294,9 @@ header {
   background: var(--navy-light); border: 1px solid var(--border2);
   font-size: 11px; font-weight: 600; color: var(--text-dim); letter-spacing: 0.02em;
 }
-
 .msg-body { display: flex; flex-direction: column; max-width: 80%; }
 @media(min-width:560px){ .msg-body { max-width: 70%; } }
 .message.user .msg-body { align-items: flex-end; }
-
 .bubble { padding: 13px 16px; font-size: 14px; line-height: 1.7; font-weight: 300; }
 .message.bot .bubble {
   background: var(--navy-card); border: 1px solid var(--border);
@@ -369,45 +308,17 @@ header {
   border-radius: var(--radius) 3px var(--radius) var(--radius);
   color: var(--text); font-weight: 400;
 }
-
-/* ✅ ADDED: Markdown rendering styles */
-.message.bot .bubble h1,
-.message.bot .bubble h2,
-.message.bot .bubble h3 {
-  font-family: var(--font-serif);
-  color: var(--gold-light);
-  margin: 10px 0 6px;
-  font-size: 15px;
-  font-weight: 600;
+.message.bot .bubble h1, .message.bot .bubble h2, .message.bot .bubble h3 {
+  font-family: var(--font-serif); color: var(--gold-light);
+  margin: 10px 0 6px; font-size: 15px; font-weight: 600;
 }
-.message.bot .bubble strong {
-  color: var(--gold-light);
-  font-weight: 600;
-}
-.message.bot .bubble ul,
-.message.bot .bubble ol {
-  padding-left: 18px;
-  margin: 6px 0;
-}
-.message.bot .bubble li {
-  margin-bottom: 5px;
-  line-height: 1.6;
-  color: var(--text);
-}
-.message.bot .bubble p {
-  margin-bottom: 8px;
-}
-.message.bot .bubble p:last-child {
-  margin-bottom: 0;
-}
-.message.bot .bubble hr {
-  border: none;
-  border-top: 1px solid var(--border2);
-  margin: 10px 0;
-}
-
+.message.bot .bubble strong { color: var(--gold-light); font-weight: 600; }
+.message.bot .bubble ul, .message.bot .bubble ol { padding-left: 18px; margin: 6px 0; }
+.message.bot .bubble li { margin-bottom: 5px; line-height: 1.6; color: var(--text); }
+.message.bot .bubble p { margin-bottom: 8px; }
+.message.bot .bubble p:last-child { margin-bottom: 0; }
+.message.bot .bubble hr { border: none; border-top: 1px solid var(--border2); margin: 10px 0; }
 .msg-time { font-size: 10px; color: var(--text-muted); margin-top: 5px; padding: 0 3px; letter-spacing: 0.04em; }
-
 .msg-actions { display: flex; align-items: center; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
 .act-btn {
   background: var(--navy-card); border: 1px solid var(--border);
@@ -419,9 +330,10 @@ header {
 }
 .act-btn:hover { color: var(--text); border-color: var(--border2); background: var(--navy-hover); }
 .act-btn.copied { color: #4ade80; border-color: rgba(74,222,128,0.25); background: rgba(74,222,128,0.05); }
-.act-btn.good   { color: #4ade80; border-color: rgba(74,222,128,0.25); }
-.act-btn.bad    { color: var(--danger); border-color: rgba(248,113,113,0.25); }
-
+.act-btn.good { color: #4ade80; border-color: rgba(74,222,128,0.25); }
+.act-btn.bad { color: var(--danger); border-color: rgba(248,113,113,0.25); }
+/* NEW: TTS playing state */
+.act-btn.playing { color: var(--gold-light); border-color: var(--gold-border); background: var(--gold-dim); }
 .followups { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
 .followup-chip {
   padding: 6px 12px; border-radius: 100px;
@@ -431,7 +343,6 @@ header {
   -webkit-tap-highlight-color: transparent;
 }
 .followup-chip:hover { border-color: var(--gold-border); color: var(--gold-light); background: var(--gold-dim); }
-
 .error-bubble {
   background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.2);
   border-radius: 3px var(--radius) var(--radius) var(--radius);
@@ -445,10 +356,25 @@ header {
   cursor: pointer; font-family: var(--font-sans); transition: all 0.2s;
 }
 .retry-btn:hover { background: rgba(248,113,113,0.2); }
-
 .typing .bubble { display: flex; align-items: center; gap: 6px; padding: 18px 20px; }
 .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text-dim2); animation: bounce 1.2s ease infinite; }
 .dot:nth-child(2){animation-delay:.18s;} .dot:nth-child(3){animation-delay:.36s;}
+
+/* NEW: language detection banner */
+.lang-detected-banner {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--gold-dim); border: 1px solid var(--gold-border);
+  border-radius: var(--radius-sm); padding: 7px 14px;
+  font-size: 12px; color: var(--gold-light);
+  animation: fadeUp 0.3s ease both;
+}
+.lang-detected-banner button {
+  background: none; border: none; color: var(--gold-light);
+  font-size: 11px; text-decoration: underline; cursor: pointer;
+  font-family: var(--font-sans); padding: 0; margin-left: auto;
+  opacity: 0.7;
+}
+.lang-detected-banner button:hover { opacity: 1; }
 
 /* ── Autocomplete ── */
 .autocomplete { width:100%; max-width:820px; padding:0 20px; display:none; }
@@ -475,7 +401,6 @@ header {
   animation: slideUp 0.7s 0.25s cubic-bezier(0.22,1,0.36,1) both; opacity:0;
 }
 @media(min-width:560px){ .input-area { padding: 12px 28px calc(env(safe-area-inset-bottom,0px)+18px); } }
-
 .input-box {
   display: flex; align-items: center; gap: 8px;
   background: var(--navy-card); border: 1px solid var(--border2);
@@ -487,14 +412,12 @@ header {
   border-color: var(--gold-border);
   box-shadow: 0 0 0 3px rgba(45,212,191,0.08), 0 2px 16px rgba(0,0,0,0.3);
 }
-
 #userInput {
   flex:1; background:none; border:none; outline:none;
   font-family:var(--font-sans); font-size:14px; font-weight:300;
   color:var(--text); resize:none; max-height:120px; line-height:1.6;
 }
 #userInput::placeholder { color:var(--text-muted); }
-
 #micBtn {
   width:36px; height:36px; min-width:36px; border-radius:9px;
   background:var(--navy-mid); border:1px solid var(--border2);
@@ -503,7 +426,6 @@ header {
 }
 #micBtn:hover { border-color:var(--gold-border); background:var(--gold-dim); }
 #micBtn.listening { background:var(--gold-dim); border-color:var(--gold-border); box-shadow:0 0 14px rgba(45,212,191,0.25); animation:pulse 1s ease infinite; }
-
 #sendBtn {
   width:36px; height:36px; min-width:36px; border-radius:9px;
   background: linear-gradient(135deg, #2dd4bf, #0e9a8a);
@@ -514,10 +436,8 @@ header {
 #sendBtn:hover { transform:scale(1.05); box-shadow:0 4px 16px rgba(45,212,191,0.4); }
 #sendBtn:active { transform:scale(0.96); }
 #sendBtn:disabled { background:var(--navy-light); box-shadow:none; cursor:not-allowed; transform:none; }
-
 .input-hint { text-align:center; font-size:10.5px; color:var(--text-muted); margin-top:8px; display:none; letter-spacing:0.04em; font-weight:300; }
 @media(min-width:600px){ .input-hint{display:block;} }
-
 .toast {
   position:fixed; bottom:80px; left:50%;
   transform:translateX(-50%) translateY(14px);
@@ -529,12 +449,11 @@ header {
   box-shadow:0 4px 20px rgba(0,0,0,0.4);
 }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-
 @keyframes slideDown { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
-@keyframes slideUp   { from{opacity:0;transform:translateY(14px)}  to{opacity:1;transform:translateY(0)} }
-@keyframes fadeUp    { from{opacity:0;transform:translateY(10px)}  to{opacity:1;transform:translateY(0)} }
-@keyframes bounce    { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
-@keyframes pulse     { 0%,100%{opacity:1} 50%{opacity:0.5} }
+@keyframes slideUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
 </style>
 </head>
 <body>
@@ -556,10 +475,15 @@ header {
       <div class="brand-sub">Intelligent Support Assistant</div>
     </div>
     <div class="header-actions">
-      <div class="lang-toggle">
-        <button class="lang-btn active" id="btnEn" onclick="setLang('en')">EN</button>
-        <button class="lang-btn" id="btnHi" onclick="setLang('hi')">हि</button>
+
+      <!-- Language toggle with auto-detect dot -->
+      <div class="lang-toggle" title="Language / भाषा">
+        <button class="lang-btn active" id="btnEn" onclick="setLangManual('en')">EN</button>
+        <button class="lang-btn" id="btnHi" onclick="setLangManual('hi')">हि</button>
+        <!-- glowing dot appears when auto-detect is active -->
+        <div class="lang-auto-dot" id="langAutoDot" title="Auto-detecting language"></div>
       </div>
+
       <div class="status-badge">
         <span class="status-pulse"></span>Online
       </div>
@@ -585,7 +509,7 @@ header {
   <div class="input-area">
     <div class="input-box">
       <textarea id="userInput" rows="1" placeholder="Ask about your banking needs…"></textarea>
-      <button id="micBtn" onclick="toggleVoice()" title="Voice input">
+      <button id="micBtn" onclick="toggleVoice()" title="Voice input / वॉयस इनपुट">
         <svg viewBox="0 0 18 18" fill="none" stroke="rgba(232,237,245,0.4)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
           <rect x="6" y="1" width="6" height="9" rx="3"/>
           <path d="M3 8a6 6 0 0 0 12 0"/>
@@ -600,44 +524,56 @@ header {
         </svg>
       </button>
     </div>
-    <p class="input-hint">Press Enter to send · Shift+Enter for new line · Mic for voice input</p>
+    <p class="input-hint">Press Enter to send · Shift+Enter for new line · Mic for voice input · 🌐 Auto language detection</p>
   </div>
-
 </div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-const chatWrap = document.getElementById('chatWrap');
-const userInput = document.getElementById('userInput');
-const sendBtn = document.getElementById('sendBtn');
+const chatWrap       = document.getElementById('chatWrap');
+const userInput      = document.getElementById('userInput');
+const sendBtn        = document.getElementById('sendBtn');
 const autocompleteEl = document.getElementById('autocomplete');
 const autocompleteInner = document.getElementById('autocompleteInner');
+const langAutoDot    = document.getElementById('langAutoDot');
 
-const API_URL = 'https://support-agent-production-ce11.up.railway.app/chat';
-const sessionId = 'user_' + Math.random().toString(36).slice(2, 9);
-const STORAGE_KEY = 'nbs_pro_v1';
+const API_URL     = 'https://support-agent-production-ce11.up.railway.app/chat';
+const TTS_URL     = 'https://support-agent-production-ce11.up.railway.app/tts';
+const DETECT_URL  = 'https://support-agent-production-ce11.up.railway.app/detect-language';
+const sessionId   = 'user_' + Math.random().toString(36).slice(2, 9);
+const STORAGE_KEY = 'nbs_pro_v2';
 
-let lang = localStorage.getItem('nbs_lang') || 'en';
+// ── Language state ──────────────────────────────────────────────────────────
+// langMode: 'auto' | 'manual'
+// lang: 'en' | 'hi'  (current active language for UI)
+let langMode = localStorage.getItem('nbs_lang_mode') || 'auto';
+let lang     = localStorage.getItem('nbs_lang') || 'en';
 
+// Track current TTS audio so we can stop it
+let currentAudio = null;
+
+// ── i18n strings ────────────────────────────────────────────────────────────
 const I18N = {
   en: {
     placeholder: 'How can we assist you today?',
     h2: 'Your trusted<br><span>banking partner</span>',
     sub: 'Get instant answers on accounts, loans, interest rates, fees, and all banking services.',
-    primary_label: 'Popular Services',
-    secondary_label: 'More Options',
+    primary_label: 'Popular Services', secondary_label: 'More Options',
     primary: [
       { icon: 'savings', label: 'Savings Account', desc: 'Competitive rates & exclusive benefits tailored for you', query: 'Tell me about savings account rates and benefits' },
-      { icon: 'loan',    label: 'Loan Services',   desc: 'Quick approvals with flexible repayment options', query: 'How do I apply for a loan and what are the requirements?' },
+      { icon: 'loan',    label: 'Loan Services',   desc: 'Quick approvals with flexible repayment options',        query: 'How do I apply for a loan and what are the requirements?' },
     ],
     secondary: [
-      { icon: 'deposit', label: 'Fixed Deposits',  desc: 'Assured returns', query: 'What are the fixed deposit interest rates and tenure options?' },
-      { icon: 'card',    label: 'Credit Cards',    desc: 'Fees & rewards',  query: 'Tell me about credit card fees, rewards, and how to apply' },
+      { icon: 'deposit', label: 'Fixed Deposits', desc: 'Assured returns',  query: 'What are the fixed deposit interest rates and tenure options?' },
+      { icon: 'card',    label: 'Credit Cards',   desc: 'Fees & rewards',   query: 'Tell me about credit card fees, rewards, and how to apply' },
     ],
     quick_label: 'Frequently Asked',
     quick: ['Minimum balance requirements', 'Reset PIN / password', 'Transfer limits & fees', 'Net banking setup', 'ATM withdrawal limit', 'Close my account'],
     listening: 'Listening…', conn_error: 'Connection error. Please check your internet and try again.',
     copied: 'Copied', retry: 'Retry',
+    lang_detected: '🌐 Hindi detected — switching to हिंदी',
+    lang_switch_back: 'Switch back to English',
     followups: {
       savings: ['Minimum balance?', 'How to open savings account?', 'Is interest taxable?'],
       loan:    ['Documents required?', 'Interest rate?', 'Approval timeline?'],
@@ -651,20 +587,21 @@ const I18N = {
     placeholder: 'आज हम आपकी कैसे सहायता कर सकते हैं?',
     h2: 'आपका विश्वसनीय<br><span>बैंकिंग साझेदार</span>',
     sub: 'खाते, लोन, ब्याज दर, शुल्क या किसी भी बैंकिंग सेवा के बारे में तत्काल उत्तर पाएं।',
-    primary_label: 'लोकप्रिय सेवाएं',
-    secondary_label: 'अन्य विकल्प',
+    primary_label: 'लोकप्रिय सेवाएं', secondary_label: 'अन्य विकल्प',
     primary: [
-      { icon: 'savings', label: 'बचत खाता',   desc: 'प्रतिस्पर्धी दरें और विशेष लाभ', query: 'बचत खाते की ब्याज दर और लाभ बताएं' },
-      { icon: 'loan',    label: 'लोन सेवाएं',  desc: 'त्वरित अनुमोदन और लचीला पुनर्भुगतान', query: 'लोन के लिए कैसे आवेदन करें?' },
+      { icon: 'savings', label: 'बचत खाता',   desc: 'प्रतिस्पर्धी दरें और विशेष लाभ',             query: 'बचत खाते की ब्याज दर और लाभ बताएं' },
+      { icon: 'loan',    label: 'लोन सेवाएं', desc: 'त्वरित अनुमोदन और लचीला पुनर्भुगतान',        query: 'लोन के लिए कैसे आवेदन करें?' },
     ],
     secondary: [
       { icon: 'deposit', label: 'फिक्स्ड डिपॉजिट', desc: 'सुनिश्चित रिटर्न', query: 'फिक्स्ड डिपॉजिट की ब्याज दरें?' },
-      { icon: 'card',    label: 'क्रेडिट कार्ड',   desc: 'शुल्क और पुरस्कार',  query: 'क्रेडिट कार्ड के शुल्क और लाभ?' },
+      { icon: 'card',    label: 'क्रेडिट कार्ड',   desc: 'शुल्क और पुरस्कार', query: 'क्रेडिट कार्ड के शुल्क और लाभ?' },
     ],
     quick_label: 'सामान्य प्रश्न',
     quick: ['न्यूनतम बैलेंस', 'पिन रीसेट', 'ट्रांसफर सीमा', 'नेट बैंकिंग', 'ATM लिमिट', 'खाता बंद करें'],
     listening: 'सुन रहा हूँ…', conn_error: 'कनेक्शन त्रुटि। कृपया अपना इंटरनेट जाँचें।',
     copied: 'कॉपी हो गया', retry: 'पुनः प्रयास',
+    lang_detected: '🌐 English detected — switching to English',
+    lang_switch_back: 'हिंदी पर वापस जाएं',
     followups: {
       savings: ['न्यूनतम बैलेंस?', 'खाता कैसे खोलें?', 'ब्याज पर टैक्स?'],
       loan:    ['दस्तावेज़?', 'ब्याज दर?', 'अनुमोदन समय?'],
@@ -683,19 +620,133 @@ const ICONS = {
   card:    `<svg viewBox="0 0 16 16" fill="none" stroke="rgba(226,240,249,0.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="1" y="3" width="14" height="10" rx="2"/><path d="M1 7h14"/><circle cx="4.5" cy="11" r="1" fill="rgba(226,240,249,0.35)" stroke="none"/></svg>`,
   bot:     `<svg viewBox="0 0 20 20" fill="none" stroke="#2dd4bf" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><rect x="3" y="6" width="14" height="10" rx="3"/><path d="M10 2v4"/><circle cx="10" cy="2" r="1.2" fill="#2dd4bf" stroke="none"/><circle cx="7" cy="11" r="1.2" fill="#2dd4bf" stroke="none" opacity="0.7"/><circle cx="13" cy="11" r="1.2" fill="#2dd4bf" stroke="none" opacity="0.7"/><path d="M7 15h6" stroke-opacity="0.6"/></svg>`,
 };
-
 const ARROW_SVG = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11L11 3M5 3h6v6"/></svg>`;
+
+// ── Language helpers ─────────────────────────────────────────────────────────
 
 function t() { return I18N[lang]; }
 
-function setLang(l) {
-  lang = l; localStorage.setItem('nbs_lang', l);
-  document.getElementById('btnEn').classList.toggle('active', l==='en');
-  document.getElementById('btnHi').classList.toggle('active', l==='hi');
+function applyLang(newLang, mode) {
+  lang     = newLang;
+  langMode = mode;
+  localStorage.setItem('nbs_lang', lang);
+  localStorage.setItem('nbs_lang_mode', langMode);
+
+  document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+  document.getElementById('btnHi').classList.toggle('active', lang === 'hi');
+  // Show glowing dot only when auto-detect is active
+  langAutoDot.classList.toggle('visible', langMode === 'auto');
   userInput.placeholder = t().placeholder;
+}
+
+function setLangManual(l) {
+  // User explicitly clicked a toggle button → manual mode, no auto-detect
+  applyLang(l, 'manual');
   const w = document.getElementById('welcome');
   if (w) { w.remove(); renderWelcome(); }
 }
+
+// Detect language via backend, then auto-switch if in auto mode
+async function autoDetectLang(text) {
+  if (langMode === 'manual') return lang;  // respect manual override
+  if (text.length < 4) return lang;        // too short to detect reliably
+  try {
+    const res = await fetch(DETECT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    const data = await res.json();
+    const detected = data.detected_lang || 'en';
+    if (detected !== lang) {
+      // Show banner before switching
+      showLangDetectedBanner(detected);
+      applyLang(detected, 'auto');
+    }
+    return detected;
+  } catch {
+    return lang;
+  }
+}
+
+function showLangDetectedBanner(detectedLang) {
+  // Remove any existing banner
+  document.querySelectorAll('.lang-detected-banner').forEach(b => b.remove());
+  const banner = document.createElement('div');
+  banner.className = 'lang-detected-banner';
+  const oppositeLang = detectedLang === 'hi' ? 'en' : 'hi';
+  banner.innerHTML = `
+    <span>${detectedLang === 'hi' ? '🌐 हिंदी detected — switching to हिंदी' : '🌐 English detected — switching to English'}</span>
+    <button onclick="setLangManual('${oppositeLang}'); this.closest('.lang-detected-banner').remove();">
+      ${detectedLang === 'hi' ? 'Keep English' : 'हिंदी रखें'}
+    </button>
+  `;
+  chatWrap.appendChild(banner);
+  chatWrap.scrollTop = chatWrap.scrollHeight;
+  setTimeout(() => banner.remove(), 5000);
+}
+
+// ── TTS ──────────────────────────────────────────────────────────────────────
+
+async function speakText(text, btnEl, ttsLang) {
+  // Stop any currently playing audio
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
+    // Reset all playing buttons
+    document.querySelectorAll('.act-btn.playing').forEach(b => {
+      b.classList.remove('playing');
+      b.innerHTML = speakerIcon() + ' Listen';
+    });
+    if (btnEl.dataset.wasPlaying === 'true') {
+      btnEl.dataset.wasPlaying = '';
+      return; // toggle off
+    }
+  }
+
+  btnEl.classList.add('playing');
+  btnEl.innerHTML = speakerIcon() + ' Playing…';
+  btnEl.dataset.wasPlaying = 'true';
+
+  try {
+    const res = await fetch(TTS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text.slice(0, 500), lang: ttsLang })  // limit chars
+    });
+    if (!res.ok) throw new Error('TTS failed');
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    currentAudio = audio;
+    audio.play();
+    audio.onended = () => {
+      btnEl.classList.remove('playing');
+      btnEl.innerHTML = speakerIcon() + ' Listen';
+      btnEl.dataset.wasPlaying = '';
+      currentAudio = null;
+      URL.revokeObjectURL(url);
+    };
+  } catch {
+    btnEl.classList.remove('playing');
+    btnEl.innerHTML = speakerIcon() + ' Listen';
+    btnEl.dataset.wasPlaying = '';
+    // Fallback to browser TTS if API fails
+    if ('speechSynthesis' in window) {
+      const utt = new SpeechSynthesisUtterance(text.slice(0, 300));
+      utt.lang = ttsLang === 'hi' ? 'hi-IN' : 'en-IN';
+      window.speechSynthesis.speak(utt);
+    } else {
+      showToast('TTS not available');
+    }
+  }
+}
+
+function speakerIcon() {
+  return `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`;
+}
+
+// ── Utilities ────────────────────────────────────────────────────────────────
 
 function showToast(msg) {
   const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show');
@@ -713,6 +764,7 @@ function saveHistory() {
   });
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(msgs)); } catch(e){}
 }
+
 function loadHistory() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -726,37 +778,38 @@ function loadHistory() {
 
 function getFollowups(text) {
   const lo = text.toLowerCase(), fu = t().followups;
-  if (lo.includes('saving')||lo.includes('बचत'))     return fu.savings;
-  if (lo.includes('loan')||lo.includes('लोन'))        return fu.loan;
-  if (lo.includes('credit')||lo.includes('क्रेडिट'))  return fu.credit;
+  if (lo.includes('saving')||lo.includes('बचत'))    return fu.savings;
+  if (lo.includes('loan')||lo.includes('लोन'))      return fu.loan;
+  if (lo.includes('credit')||lo.includes('क्रेडिट')) return fu.credit;
   if (lo.includes('deposit')||lo.includes('fixed')||lo.includes('डिपॉज़िट')) return fu.deposit;
-  if (lo.includes('account')||lo.includes('खाता'))   return fu.account;
+  if (lo.includes('account')||lo.includes('खाता'))  return fu.account;
   return fu.default;
 }
 
-// ✅ UPDATED: addMessage with markdown rendering
+// ── Message rendering ────────────────────────────────────────────────────────
+
 function addMessage(text, role, timeStr, silent) {
   const welcome = document.getElementById('welcome');
   if (welcome) welcome.remove();
 
-  const msg = document.createElement('div'); msg.className=`message ${role}`;
-  const av = document.createElement('div'); av.className='avatar';
-  if (role==='bot') av.innerHTML = ICONS.bot; else av.textContent = 'U';
-  const body = document.createElement('div'); body.className='msg-body';
-  const bubble = document.createElement('div'); bubble.className='bubble';
-  bubble.dataset.raw = text; // store raw text for copy & history
-  const time = document.createElement('div'); time.className='msg-time'; time.textContent = timeStr || getTime();
+  const msg    = document.createElement('div'); msg.className = `message ${role}`;
+  const av     = document.createElement('div'); av.className = 'avatar';
+  if (role === 'bot') av.innerHTML = ICONS.bot; else av.textContent = 'U';
+  const body   = document.createElement('div'); body.className = 'msg-body';
+  const bubble = document.createElement('div'); bubble.className = 'bubble';
+  bubble.dataset.raw = text;
+  const time   = document.createElement('div'); time.className = 'msg-time'; time.textContent = timeStr || getTime();
+
   body.appendChild(bubble); body.appendChild(time);
   msg.appendChild(av); msg.appendChild(body);
   chatWrap.appendChild(msg);
-  requestAnimationFrame(() => { msg.style.opacity='1'; });
+  requestAnimationFrame(() => { msg.style.opacity = '1'; });
 
-  if (role==='bot') {
+  if (role === 'bot') {
     if (silent) {
-      bubble.innerHTML = marked.parse(text); // ✅ render markdown
-      addBotActions(body, text);
+      bubble.innerHTML = marked.parse(text);
+      addBotActions(body, text, lang);
     } else {
-      // Stream chars, then render markdown at the end
       let i = 0;
       bubble.textContent = '';
       const iv = setInterval(() => {
@@ -764,8 +817,8 @@ function addMessage(text, role, timeStr, silent) {
         chatWrap.scrollTop = chatWrap.scrollHeight;
         if (i >= text.length) {
           clearInterval(iv);
-          bubble.innerHTML = marked.parse(text); // ✅ render markdown when streaming done
-          addBotActions(body, text);
+          bubble.innerHTML = marked.parse(text);
+          addBotActions(body, text, lang);
           saveHistory();
         }
       }, 14);
@@ -777,134 +830,178 @@ function addMessage(text, role, timeStr, silent) {
   chatWrap.scrollTop = chatWrap.scrollHeight;
 }
 
-function addBotActions(body, text) {
-  const actions = document.createElement('div'); actions.className='msg-actions';
-  actions.innerHTML=`
-    <button class="act-btn" onclick="copyText(this,'${encodeURIComponent(text)}')">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-      Copy
-    </button>
-    <button class="act-btn" onclick="giveFeedback(this,'good')">👍</button>
-    <button class="act-btn" onclick="giveFeedback(this,'bad')">👎</button>
-  `;
+function addBotActions(body, text, ttsLang) {
+  const actions = document.createElement('div'); actions.className = 'msg-actions';
+
+  // Copy button
+  const copyBtn = document.createElement('button'); copyBtn.className = 'act-btn';
+  copyBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+  copyBtn.onclick = () => copyText(copyBtn, text);
+  actions.appendChild(copyBtn);
+
+  // NEW: Listen/TTS button
+  const ttsBtn = document.createElement('button'); ttsBtn.className = 'act-btn';
+  ttsBtn.innerHTML = speakerIcon() + ' Listen';
+  // Extract plain text for TTS (strip markdown)
+  const plainText = text.replace(/\*\*/g,'').replace(/\*/g,'').replace(/#+\s/g,'').replace(/- /g,'');
+  ttsBtn.onclick = () => speakText(plainText, ttsBtn, ttsLang);
+  actions.appendChild(ttsBtn);
+
+  // Thumbs
+  const goodBtn = document.createElement('button'); goodBtn.className = 'act-btn'; goodBtn.textContent = '👍';
+  goodBtn.onclick = () => giveFeedback(goodBtn, 'good'); actions.appendChild(goodBtn);
+  const badBtn  = document.createElement('button'); badBtn.className  = 'act-btn'; badBtn.textContent  = '👎';
+  badBtn.onclick  = () => giveFeedback(badBtn,  'bad');  actions.appendChild(badBtn);
+
   body.appendChild(actions);
+
   const chips = getFollowups(text);
   if (chips.length) {
-    const fu = document.createElement('div'); fu.className='followups';
-    chips.forEach(c=>{
-      const btn=document.createElement('button'); btn.className='followup-chip'; btn.textContent=c;
-      btn.onclick=()=>{ userInput.value=c; sendMessage(); }; fu.appendChild(btn);
+    const fu = document.createElement('div'); fu.className = 'followups';
+    chips.forEach(c => {
+      const btn = document.createElement('button'); btn.className = 'followup-chip'; btn.textContent = c;
+      btn.onclick = () => { userInput.value = c; sendMessage(); };
+      fu.appendChild(btn);
     });
     body.appendChild(fu);
   }
 }
 
 function addErrorBubble(lastText) {
-  const welcome=document.getElementById('welcome'); if(welcome) welcome.remove();
-  const msg=document.createElement('div'); msg.className='message bot'; msg.style.opacity='1';
-  const av=document.createElement('div'); av.className='avatar'; av.innerHTML=ICONS.bot;
-  const body=document.createElement('div'); body.className='msg-body';
-  const errDiv=document.createElement('div'); errDiv.className='error-bubble';
-  errDiv.innerHTML=`⚠️ ${t().conn_error} <button class="retry-btn" onclick="retryMessage(this,'${encodeURIComponent(lastText)}')">${t().retry}</button>`;
+  const welcome = document.getElementById('welcome'); if (welcome) welcome.remove();
+  const msg = document.createElement('div'); msg.className = 'message bot'; msg.style.opacity = '1';
+  const av  = document.createElement('div'); av.className = 'avatar'; av.innerHTML = ICONS.bot;
+  const body = document.createElement('div'); body.className = 'msg-body';
+  const errDiv = document.createElement('div'); errDiv.className = 'error-bubble';
+  errDiv.innerHTML = `⚠️ ${t().conn_error} <button class="retry-btn" onclick="retryMessage(this,'${encodeURIComponent(lastText)}')">${t().retry}</button>`;
   body.appendChild(errDiv); msg.appendChild(av); msg.appendChild(body);
-  chatWrap.appendChild(msg); chatWrap.scrollTop=chatWrap.scrollHeight;
+  chatWrap.appendChild(msg); chatWrap.scrollTop = chatWrap.scrollHeight;
 }
 
 async function retryMessage(btn, enc) {
-  const text=decodeURIComponent(enc); btn.closest('.message').remove();
-  addMessage(text,'user'); await callAPI(text);
+  const text = decodeURIComponent(enc); btn.closest('.message').remove();
+  addMessage(text, 'user'); await callAPI(text);
 }
 
 function addTyping() {
-  const msg=document.createElement('div'); msg.className='message bot typing'; msg.id='typing';
-  const av=document.createElement('div'); av.className='avatar'; av.innerHTML=ICONS.bot;
-  const bubble=document.createElement('div'); bubble.className='bubble';
-  bubble.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  const msg    = document.createElement('div'); msg.className = 'message bot typing'; msg.id = 'typing';
+  const av     = document.createElement('div'); av.className = 'avatar'; av.innerHTML = ICONS.bot;
+  const bubble = document.createElement('div'); bubble.className = 'bubble';
+  bubble.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
   msg.appendChild(av); msg.appendChild(bubble);
-  chatWrap.appendChild(msg); requestAnimationFrame(()=>{ msg.style.opacity='1'; });
-  chatWrap.scrollTop=chatWrap.scrollHeight;
+  chatWrap.appendChild(msg); requestAnimationFrame(() => { msg.style.opacity = '1'; });
+  chatWrap.scrollTop = chatWrap.scrollHeight;
 }
-function removeTyping(){ const t=document.getElementById('typing'); if(t) t.remove(); }
+function removeTyping(){ const t = document.getElementById('typing'); if (t) t.remove(); }
+
+// ── API call ─────────────────────────────────────────────────────────────────
 
 async function callAPI(text) {
   addTyping();
   try {
-    const res = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question:text, session_id:sessionId})});
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        question:   text,
+        session_id: sessionId,
+        lang:       langMode === 'manual' ? lang : null   // pass override only if manual
+      })
+    });
     const data = await res.json();
     removeTyping();
+
     if (data.data && data.data.summary) {
       const r = data.data;
+      // Use detected_lang from backend to drive TTS language
+      const responseLang = r.detected_lang || lang;
+      if (langMode === 'auto' && responseLang !== lang) {
+        applyLang(responseLang, 'auto');
+      }
       const formatted = `**Summary:** ${r.summary}\n\n**Details:**\n${r.details.map(d=>'- '+d).join('\n')}\n\n**Next Steps:**\n${r.next_steps.map(s=>'- '+s).join('\n')}`;
       addMessage(formatted, 'bot');
     } else {
       addMessage(data.data?.error || 'Sorry, I could not get a response.', 'bot');
     }
   } catch(err) { removeTyping(); addErrorBubble(text); }
-  sendBtn.disabled=false; userInput.focus();
+  sendBtn.disabled = false; userInput.focus();
 }
+
+// ── Send message (with auto-detect) ─────────────────────────────────────────
 
 async function sendMessage() {
-  const text=userInput.value.trim(); if(!text) return;
-  userInput.value=''; userInput.style.height='auto';
-  hideAutocomplete(); sendBtn.disabled=true;
-  addMessage(text,'user'); await callAPI(text);
+  const text = userInput.value.trim(); if (!text) return;
+  userInput.value = ''; userInput.style.height = 'auto';
+  hideAutocomplete(); sendBtn.disabled = true;
+  addMessage(text, 'user');
+
+  // Auto-detect language from user input before calling API
+  if (langMode !== 'manual') {
+    await autoDetectLang(text);
+  }
+
+  await callAPI(text);
 }
 
-function copyText(btn, enc) {
-  const text=decodeURIComponent(enc);
-  navigator.clipboard.writeText(text).then(()=>{
+// ── Copy ─────────────────────────────────────────────────────────────────────
+
+function copyText(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
     btn.classList.add('copied');
-    btn.innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${t().copied}`;
+    btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${t().copied}`;
     showToast(t().copied);
-    setTimeout(()=>{
+    setTimeout(() => {
       btn.classList.remove('copied');
-      btn.innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
-    },2200);
-  }).catch(()=>showToast('Copy failed'));
+      btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+    }, 2200);
+  }).catch(() => showToast('Copy failed'));
 }
 
 function giveFeedback(btn, type) {
-  btn.parentElement.querySelectorAll('.act-btn').forEach(b=>b.disabled=true);
-  btn.classList.add(type==='good'?'good':'bad');
+  btn.parentElement.querySelectorAll('.act-btn').forEach(b => b.disabled = true);
+  btn.classList.add(type === 'good' ? 'good' : 'bad');
 }
 
-// Autocomplete
+// ── Autocomplete ─────────────────────────────────────────────────────────────
+
 const AC = {
-  en:['How do I apply for a loan?','What is the savings account interest rate?','How to open a new account?','Fixed deposit interest rates','Credit card fees and charges','How to transfer money online?','What documents do I need?','How to reset my net banking PIN?','What is the minimum balance?','How to close my account?','Net banking setup guide','ATM daily withdrawal limit'],
-  hi:['लोन के लिए कैसे आवेदन करें?','बचत खाते की ब्याज दर?','नया खाता कैसे खोलें?','फिक्स्ड डिपॉजिट दरें','क्रेडिट कार्ड शुल्क','ऑनलाइन पैसे ट्रांसफर?','कौन से दस्तावेज़ चाहिए?','नेट बैंकिंग पिन रीसेट?','न्यूनतम बैलेंस?','खाता बंद कैसे करें?']
+  en: ['How do I apply for a loan?','What is the savings account interest rate?','How to open a new account?','Fixed deposit interest rates','Credit card fees and charges','How to transfer money online?','What documents do I need?','How to reset my net banking PIN?','What is the minimum balance?','How to close my account?','Net banking setup guide','ATM daily withdrawal limit'],
+  hi: ['लोन के लिए कैसे आवेदन करें?','बचत खाते की ब्याज दर?','नया खाता कैसे खोलें?','फिक्स्ड डिपॉजिट दरें','क्रेडिट कार्ड शुल्क','ऑनलाइन पैसे ट्रांसफर?','कौन से दस्तावेज़ चाहिए?','नेट बैंकिंग पिन रीसेट?','न्यूनतम बैलेंस?','खाता बंद कैसे करें?']
 };
+
 function showAutocomplete(q) {
-  if(!q){hideAutocomplete();return;}
-  const list=AC[lang]||AC.en;
-  const matches=list.filter(s=>s.toLowerCase().includes(q.toLowerCase())).slice(0,5);
-  if(!matches.length){hideAutocomplete();return;}
-  autocompleteInner.innerHTML='';
-  matches.forEach(m=>{
-    const c=document.createElement('button'); c.className='ac-chip'; c.textContent=m;
-    c.onclick=()=>{userInput.value=m;hideAutocomplete();sendMessage();};
+  if (!q) { hideAutocomplete(); return; }
+  const list    = AC[lang] || AC.en;
+  const matches = list.filter(s => s.toLowerCase().includes(q.toLowerCase())).slice(0, 5);
+  if (!matches.length) { hideAutocomplete(); return; }
+  autocompleteInner.innerHTML = '';
+  matches.forEach(m => {
+    const c = document.createElement('button'); c.className = 'ac-chip'; c.textContent = m;
+    c.onclick = () => { userInput.value = m; hideAutocomplete(); sendMessage(); };
     autocompleteInner.appendChild(c);
   });
   autocompleteEl.classList.add('visible');
 }
-function hideAutocomplete(){autocompleteEl.classList.remove('visible');}
+function hideAutocomplete() { autocompleteEl.classList.remove('visible'); }
 
-userInput.addEventListener('input',()=>{
-  userInput.style.height='auto';
-  userInput.style.height=Math.min(userInput.scrollHeight,120)+'px';
+userInput.addEventListener('input', () => {
+  userInput.style.height = 'auto';
+  userInput.style.height = Math.min(userInput.scrollHeight, 120) + 'px';
   showAutocomplete(userInput.value.trim());
 });
-userInput.addEventListener('keydown',(e)=>{
-  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}
-  if(e.key==='Escape')hideAutocomplete();
+userInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  if (e.key === 'Escape') hideAutocomplete();
 });
 
-// Welcome
-function renderWelcome() {
-  const w=document.createElement('div'); w.className='welcome'; w.id='welcome'; w.style.opacity='1';
+// ── Welcome screen ───────────────────────────────────────────────────────────
 
-  const header=document.createElement('div'); header.className='welcome-header';
-  const iconWrap=document.createElement('div'); iconWrap.className='welcome-icon-wrap';
-  iconWrap.innerHTML=`<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+function renderWelcome() {
+  const w = document.createElement('div'); w.className = 'welcome'; w.id = 'welcome'; w.style.opacity = '1';
+
+  const header = document.createElement('div'); header.className = 'welcome-header';
+  const iconWrap = document.createElement('div'); iconWrap.className = 'welcome-icon-wrap';
+  iconWrap.innerHTML = `<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="3" y="8" width="22" height="15" rx="4" stroke="#2dd4bf" stroke-width="1.5"/>
     <path d="M14 3v5" stroke="#2dd4bf" stroke-width="1.5" stroke-linecap="round"/>
     <circle cx="14" cy="2.5" r="1.5" fill="#2dd4bf"/>
@@ -912,91 +1009,96 @@ function renderWelcome() {
     <rect x="8" y="16" width="4" height="4" rx="1.5" fill="#2dd4bf" opacity="0.7"/>
     <rect x="16" y="16" width="4" height="4" rx="1.5" fill="#2dd4bf" opacity="0.4"/>
   </svg>`;
-  const copy=document.createElement('div'); copy.className='welcome-copy';
-  copy.innerHTML=`<h2>${t().h2}</h2><p>${t().sub}</p>`;
+
+  const copy = document.createElement('div'); copy.className = 'welcome-copy';
+  copy.innerHTML = `<h2>${t().h2}</h2><p>${t().sub}</p>`;
   header.appendChild(iconWrap); header.appendChild(copy);
   w.appendChild(header);
 
-  const section=document.createElement('div'); section.className='services-section';
-
-  const pl=document.createElement('div'); pl.className='tier-label primary'; pl.textContent=t().primary_label;
+  const section = document.createElement('div'); section.className = 'services-section';
+  const pl = document.createElement('div'); pl.className = 'tier-label primary'; pl.textContent = t().primary_label;
   section.appendChild(pl);
 
-  const primaryRow=document.createElement('div'); primaryRow.className='primary-row';
-  t().primary.forEach(svc=>{
-    const card=document.createElement('div'); card.className='service-card-primary';
-    card.innerHTML=`
+  const primaryRow = document.createElement('div'); primaryRow.className = 'primary-row';
+  t().primary.forEach(svc => {
+    const card = document.createElement('div'); card.className = 'service-card-primary';
+    card.innerHTML = `
       <div class="scp-badge">★ Featured</div>
       <div class="scp-icon">${ICONS[svc.icon]}</div>
       <div class="scp-label">${svc.label}</div>
       <div class="scp-desc">${svc.desc}</div>
       <div class="scp-arrow">${ARROW_SVG}</div>
     `;
-    card.onclick=()=>{ userInput.value=svc.query; sendMessage(); };
+    card.onclick = () => { userInput.value = svc.query; sendMessage(); };
     primaryRow.appendChild(card);
   });
   section.appendChild(primaryRow);
 
-  const sl=document.createElement('div'); sl.className='tier-label secondary'; sl.textContent=t().secondary_label;
-  sl.style.marginTop='14px';
+  const sl = document.createElement('div'); sl.className = 'tier-label secondary'; sl.textContent = t().secondary_label;
+  sl.style.marginTop = '14px';
   section.appendChild(sl);
 
-  const secondaryRow=document.createElement('div'); secondaryRow.className='secondary-row';
-  t().secondary.forEach(svc=>{
-    const card=document.createElement('div'); card.className='service-card-secondary';
-    card.innerHTML=`
+  const secondaryRow = document.createElement('div'); secondaryRow.className = 'secondary-row';
+  t().secondary.forEach(svc => {
+    const card = document.createElement('div'); card.className = 'service-card-secondary';
+    card.innerHTML = `
       <div class="scs-icon">${ICONS[svc.icon]}</div>
       <div class="scs-text">
         <div class="scs-label">${svc.label}</div>
         <div class="scs-desc">${svc.desc}</div>
       </div>
     `;
-    card.onclick=()=>{ userInput.value=svc.query; sendMessage(); };
+    card.onclick = () => { userInput.value = svc.query; sendMessage(); };
     secondaryRow.appendChild(card);
   });
   section.appendChild(secondaryRow);
   w.appendChild(section);
 
-  const div=document.createElement('div'); div.className='welcome-divider';
-  w.appendChild(div);
-
-  const ql=document.createElement('div'); ql.className='quick-label'; ql.textContent=t().quick_label;
-  w.appendChild(ql);
-  const qc=document.createElement('div'); qc.className='quick-chips';
-  t().quick.forEach(s=>{
-    const btn=document.createElement('button'); btn.className='quick-chip'; btn.textContent=s;
-    btn.onclick=()=>{ userInput.value=s; sendMessage(); }; qc.appendChild(btn);
+  const div = document.createElement('div'); div.className = 'welcome-divider'; w.appendChild(div);
+  const ql  = document.createElement('div'); ql.className  = 'quick-label'; ql.textContent = t().quick_label; w.appendChild(ql);
+  const qc  = document.createElement('div'); qc.className  = 'quick-chips';
+  t().quick.forEach(s => {
+    const btn = document.createElement('button'); btn.className = 'quick-chip'; btn.textContent = s;
+    btn.onclick = () => { userInput.value = s; sendMessage(); };
+    qc.appendChild(btn);
   });
   w.appendChild(qc);
-
   chatWrap.insertBefore(w, chatWrap.firstChild);
 }
 
 function clearChat() {
-  chatWrap.innerHTML='';
-  try{localStorage.removeItem(STORAGE_KEY);}catch(e){}
+  chatWrap.innerHTML = '';
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
   renderWelcome();
 }
 
-// Voice
-let recognition=null, isListening=false;
-function toggleVoice(){
-  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
-    addMessage('Voice input is not supported in this browser. Please use Chrome.','bot'); return;
+// ── Voice input (STT) ────────────────────────────────────────────────────────
+
+let recognition = null, isListening = false;
+
+function toggleVoice() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    addMessage('Voice input is not supported in this browser. Please use Chrome.', 'bot'); return;
   }
-  if(isListening){recognition.stop();return;}
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  recognition=new SR(); recognition.lang=lang==='hi'?'hi-IN':'en-IN'; recognition.interimResults=false;
-  recognition.onstart=()=>{isListening=true;document.getElementById('micBtn').classList.add('listening');userInput.placeholder=t().listening;};
-  recognition.onresult=(e)=>{userInput.value=e.results[0][0].transcript;sendMessage();};
-  recognition.onend=recognition.onerror=()=>{isListening=false;document.getElementById('micBtn').classList.remove('listening');userInput.placeholder=t().placeholder;};
+  if (isListening) { recognition.stop(); return; }
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  // Use current lang for voice recognition
+  recognition.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
+  recognition.interimResults = false;
+  recognition.onstart  = () => { isListening = true;  document.getElementById('micBtn').classList.add('listening'); userInput.placeholder = t().listening; };
+  recognition.onresult = (e) => { userInput.value = e.results[0][0].transcript; sendMessage(); };
+  recognition.onend    = () => { isListening = false; document.getElementById('micBtn').classList.remove('listening'); userInput.placeholder = t().placeholder; };
+  recognition.onerror  = () => { isListening = false; document.getElementById('micBtn').classList.remove('listening'); userInput.placeholder = t().placeholder; };
   recognition.start();
 }
 
-// Init
-userInput.placeholder=t().placeholder;
-const hasHistory=loadHistory();
-if(!hasHistory) renderWelcome();
+// ── Init ──────────────────────────────────────────────────────────────────────
+
+applyLang(lang, langMode);
+const hasHistory = loadHistory();
+if (!hasHistory) renderWelcome();
 </script>
 </body>
 </html>
