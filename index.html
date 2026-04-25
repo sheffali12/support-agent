@@ -4,518 +4,164 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>NBS — Banking Assistant</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --navy-deep: #030f18;
-  --navy: #051525;
-  --navy-mid: #071d30;
-  --navy-light: #0a2540;
-  --navy-card: #061a2d;
-  --navy-hover: #0b2438;
-  --gold: #2dd4bf;
-  --gold-light: #5eead4;
-  --gold-dim: rgba(45,212,191,0.12);
-  --gold-border: rgba(45,212,191,0.22);
-  --accent2: #38bdf8;
-  --accent2-dim: rgba(56,189,248,0.10);
-  --border: rgba(255,255,255,0.06);
-  --border2: rgba(255,255,255,0.10);
-  --text: #e2f0f9;
-  --text-dim: rgba(226,240,249,0.50);
-  --text-dim2: rgba(226,240,249,0.28);
-  --text-muted: rgba(226,240,249,0.18);
-  --success: #4ade80;
-  --danger: #f87171;
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans: 'Outfit', sans-serif;
-  --radius: 16px;
-  --radius-sm: 10px;
+  --bg: #0d0d0d;
+  --bg2: #111111;
+  --bg3: #1a1a1a;
+  --bg4: #222222;
+  --pink: #ff0080;
+  --pink-dim: rgba(255,0,128,0.10);
+  --pink-border: rgba(255,0,128,0.28);
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.11);
+  --text: #f0f0f0;
+  --text-dim: rgba(240,240,240,0.55);
+  --text-muted: rgba(240,240,240,0.25);
+  --green: #4ade80;
+  --red: #f87171;
+  --font: 'Inter', sans-serif;
 }
-html, body {
-  height: 100%;
-  background: var(--navy-deep);
-  color: var(--text);
-  font-family: var(--font-sans);
-  font-weight: 400;
-  -webkit-font-smoothing: antialiased;
-}
-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100dvh;
-  overflow: hidden;
-}
-body::before {
-  content: '';
-  position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background:
-    radial-gradient(ellipse 60% 50% at 80% 10%, rgba(45,212,191,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 10% 80%, rgba(56,189,248,0.07) 0%, transparent 60%);
-}
-body::after {
-  content: '';
-  position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-  opacity: 0.022;
-}
-.shell {
-  position: relative; z-index: 2;
-  width: 100%; max-width: 820px;
-  height: 100dvh;
-  display: flex; flex-direction: column;
-}
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+body { display: flex; flex-direction: column; align-items: center; min-height: 100dvh; overflow: hidden; }
+.shell { width: 100%; max-width: 780px; height: 100dvh; display: flex; flex-direction: column; }
 
-/* ── Header ── */
-header {
-  flex-shrink: 0;
-  padding: 0 20px;
-  height: 62px;
-  display: flex; align-items: center; gap: 14px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(3,15,24,0.94);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  animation: slideDown 0.7s cubic-bezier(0.22,1,0.36,1) both;
-}
-@media(min-width:560px){ header { padding: 0 28px; height: 66px; } }
-.logo {
-  width: 38px; height: 38px; border-radius: 10px;
-  border: 1px solid var(--gold-border);
-  background: linear-gradient(135deg, rgba(45,212,191,0.15), rgba(45,212,191,0.04));
-  display: grid; place-items: center; flex-shrink: 0;
-}
-.logo svg { width: 20px; height: 20px; }
-.header-divider { width: 1px; height: 24px; background: var(--border2); flex-shrink: 0; }
-.brand { flex: 1; min-width: 0; }
-.brand-name {
-  font-family: var(--font-serif); font-size: 16px; font-weight: 500;
-  color: var(--text); letter-spacing: 0.01em;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.brand-sub {
-  font-size: 10.5px; color: var(--text-dim2); margin-top: 1px;
-  letter-spacing: 0.06em; text-transform: uppercase; font-weight: 400;
-}
-@media(min-width:480px){ .brand-name { font-size: 17px; } }
-.header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-
-/* ── Language toggle ── */
-.lang-toggle {
-  display: flex; align-items: center;
-  background: var(--navy-card); border: 1px solid var(--border2);
-  border-radius: 8px; overflow: hidden; flex-shrink: 0;
-  position: relative;
-}
-.lang-btn {
-  font-size: 11px; font-weight: 500; font-family: var(--font-sans);
-  color: var(--text-dim); background: none; border: none;
-  padding: 6px 10px; cursor: pointer; transition: all 0.2s;
-  letter-spacing: 0.03em;
-}
-.lang-btn.active { background: var(--gold-dim); color: var(--gold-light); }
-
-/* NEW: auto-detect indicator dot */
-.lang-auto-dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: var(--gold);
-  position: absolute; top: 4px; right: 4px;
-  display: none;
-  animation: pulse 2s ease infinite;
-}
+/* Header */
+header { flex-shrink: 0; height: 58px; padding: 0 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); background: var(--bg); }
+.logo { width: 34px; height: 34px; border-radius: 8px; background: var(--pink-dim); border: 1px solid var(--pink-border); display: grid; place-items: center; flex-shrink: 0; }
+.brand { flex: 1; }
+.brand-name { font-size: 15px; font-weight: 600; color: var(--text); }
+.brand-sub { font-size: 10px; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; margin-top: 1px; }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.lang-toggle { display: flex; background: var(--bg3); border: 1px solid var(--border2); border-radius: 7px; overflow: hidden; position: relative; }
+.lang-btn { font-size: 11px; font-weight: 500; font-family: var(--font); color: var(--text-dim); background: none; border: none; padding: 5px 10px; cursor: pointer; transition: all 0.15s; }
+.lang-btn.active { background: var(--pink-dim); color: var(--pink); }
+.lang-auto-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--pink); position: absolute; top: 3px; right: 3px; display: none; }
 .lang-auto-dot.visible { display: block; }
+.online-badge { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 100px; background: rgba(74,222,128,0.07); border: 1px solid rgba(74,222,128,0.18); font-size: 11px; font-weight: 500; color: var(--green); }
+.online-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: pulse 2s ease infinite; }
+.clear-btn { width: 32px; height: 32px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 7px; cursor: pointer; display: grid; place-items: center; color: var(--text-dim); transition: all 0.15s; }
+.clear-btn:hover { border-color: var(--pink-border); color: var(--pink); }
 
-.status-badge {
-  display: flex; align-items: center; gap: 5px;
-  padding: 5px 11px; border-radius: 100px;
-  background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.16);
-  font-size: 11px; font-weight: 500; color: #4ade80; letter-spacing: 0.02em;
-}
-.status-pulse { width: 5px; height: 5px; border-radius: 50%; background: #4ade80; animation: pulse 2.2s ease infinite; }
-.icon-btn {
-  width: 34px; height: 34px; border-radius: 8px;
-  background: var(--navy-card); border: 1px solid var(--border2);
-  cursor: pointer; display: grid; place-items: center; flex-shrink: 0;
-  transition: all 0.2s; -webkit-tap-highlight-color: transparent;
-}
-.icon-btn:hover { background: var(--navy-hover); }
-
-/* ── Chat ── */
-.chat-wrap {
-  flex: 1; overflow-y: auto;
-  padding: 24px 20px;
-  display: flex; flex-direction: column; gap: 18px;
-  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.06) transparent;
-  -webkit-overflow-scrolling: touch;
-}
-@media(min-width:560px){ .chat-wrap { padding: 30px 28px; gap: 20px; } }
+/* Chat */
+.chat-wrap { flex: 1; overflow-y: auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 16px; scrollbar-width: thin; scrollbar-color: var(--bg4) transparent; }
 .chat-wrap::-webkit-scrollbar { width: 3px; }
-.chat-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 3px; }
+.chat-wrap::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
 
-/* ── Welcome ── */
-.welcome {
-  animation: fadeUp 0.8s 0.2s cubic-bezier(0.22,1,0.36,1) both;
-  opacity: 0;
-}
-.welcome-header {
-  display: flex; align-items: flex-start; gap: 16px;
-  padding: 4px 0 24px;
-}
-.welcome-icon-wrap {
-  width: 52px; height: 52px; flex-shrink: 0; border-radius: 14px;
-  border: 1px solid var(--gold-border);
-  background: linear-gradient(135deg, rgba(45,212,191,0.12), rgba(45,212,191,0.03));
-  display: grid; place-items: center; margin-top: 4px;
-}
-.welcome-icon-wrap svg { width: 28px; height: 28px; }
-.welcome-copy h2 {
-  font-family: var(--font-serif);
-  font-size: clamp(28px, 5.5vw, 44px);
-  font-weight: 500; line-height: 1.1;
-  letter-spacing: -0.01em; color: var(--text); margin-bottom: 10px;
-}
-.welcome-copy h2 span {
-  background: linear-gradient(90deg, var(--gold-light), var(--gold));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
-.welcome-copy p {
-  font-size: 14px; color: var(--text-dim); line-height: 1.65; max-width: 440px; font-weight: 300;
-}
-
-/* ── Service cards ── */
-.services-section { margin-bottom: 22px; }
-.tier-label {
-  font-size: 9.5px; font-weight: 600; letter-spacing: 0.12em;
-  text-transform: uppercase; margin-bottom: 9px;
-  display: flex; align-items: center; gap: 7px;
-}
-.tier-label.primary { color: var(--gold); }
-.tier-label.secondary { color: var(--text-muted); }
-.tier-label::after { content: ''; flex: 1; height: 1px; }
-.tier-label.primary::after { background: linear-gradient(90deg, var(--gold-border), transparent); }
-.tier-label.secondary::after { background: linear-gradient(90deg, var(--border), transparent); }
-.primary-row {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;
-}
-@media(min-width:480px){ .primary-row { gap: 12px; } }
-.service-card-primary {
-  background: linear-gradient(145deg, #052235, #041a2a);
-  border: 1px solid var(--gold-border);
-  border-radius: var(--radius); padding: 20px 16px;
-  cursor: pointer; transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
-  -webkit-tap-highlight-color: transparent; position: relative; overflow: hidden;
-}
-.service-card-primary::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(45,212,191,0.5), transparent);
-}
-.service-card-primary::after {
-  content: ''; position: absolute; bottom: 0; right: 0;
-  width: 80px; height: 80px;
-  background: radial-gradient(circle, rgba(45,212,191,0.08) 0%, transparent 70%);
-  pointer-events: none;
-}
-.service-card-primary:hover {
-  background: linear-gradient(145deg, #073045, #052033);
-  border-color: rgba(45,212,191,0.45);
-  transform: translateY(-3px);
-  box-shadow: 0 10px 32px rgba(0,0,0,0.35), 0 0 0 1px rgba(45,212,191,0.1);
-}
-.service-card-primary:active { transform: scale(0.98); }
-.scp-badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  background: var(--gold-dim); border: 1px solid var(--gold-border);
-  border-radius: 100px; padding: 2px 8px;
-  font-size: 9px; font-weight: 600; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--gold-light); margin-bottom: 10px;
-}
-.scp-icon {
-  width: 36px; height: 36px; border-radius: 10px;
-  background: linear-gradient(135deg, rgba(45,212,191,0.2), rgba(45,212,191,0.06));
-  border: 1px solid var(--gold-border);
-  display: grid; place-items: center; margin-bottom: 12px;
-}
-.scp-icon svg { width: 18px; height: 18px; }
-.scp-label { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; margin-bottom: 4px; line-height: 1.2; }
-.scp-desc { font-size: 11.5px; color: var(--text-dim); font-weight: 300; line-height: 1.5; }
-.scp-arrow { position: absolute; bottom: 14px; right: 14px; color: var(--gold); opacity: 0.5; transition: all 0.2s; }
-.service-card-primary:hover .scp-arrow { opacity: 1; transform: translate(2px, -2px); }
-.secondary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-@media(min-width:480px){ .secondary-row { gap: 10px; } }
-.service-card-secondary {
-  background: var(--navy-card); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 13px 13px;
-  cursor: pointer; transition: all 0.2s cubic-bezier(0.22,1,0.36,1);
-  -webkit-tap-highlight-color: transparent;
-  display: flex; align-items: center; gap: 11px;
-  position: relative; overflow: hidden;
-}
-.service-card-secondary:hover {
-  background: var(--navy-hover); border-color: var(--border2);
-  transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-}
-.service-card-secondary:active { transform: scale(0.98); }
-.scs-icon {
-  width: 28px; height: 28px; min-width: 28px; border-radius: 8px;
-  background: rgba(255,255,255,0.04); border: 1px solid var(--border2);
-  display: grid; place-items: center;
-}
-.scs-icon svg { width: 14px; height: 14px; }
-.scs-label { font-size: 12px; font-weight: 500; color: var(--text-dim); letter-spacing: -0.01em; margin-bottom: 2px; line-height: 1.2; }
-.scs-desc { font-size: 10.5px; color: var(--text-muted); font-weight: 300; }
-.welcome-divider { width: 100%; height: 1px; background: linear-gradient(90deg, var(--gold-border), transparent); margin-bottom: 18px; }
-.quick-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+/* Welcome */
+.welcome { animation: fadeUp 0.5s ease both; }
+.welcome-heading { font-size: clamp(24px, 5vw, 36px); font-weight: 600; color: var(--text); line-height: 1.2; margin-bottom: 8px; }
+.welcome-heading span { color: var(--pink); }
+.welcome-sub { font-size: 14px; color: var(--text-dim); font-weight: 300; line-height: 1.6; margin-bottom: 28px; max-width: 420px; }
+.cards-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.service-card { background: var(--bg2); border: 1px solid var(--border2); border-radius: 12px; padding: 18px 16px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+.service-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--pink); opacity: 0; transition: opacity 0.2s; }
+.service-card:hover { border-color: var(--pink-border); background: var(--bg3); }
+.service-card:hover::before { opacity: 1; }
+.service-card:active { transform: scale(0.98); }
+.card-icon { width: 32px; height: 32px; background: var(--pink-dim); border: 1px solid var(--pink-border); border-radius: 8px; display: grid; place-items: center; margin-bottom: 12px; }
+.card-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.card-desc { font-size: 12px; color: var(--text-dim); font-weight: 300; line-height: 1.5; }
+.divider { height: 1px; background: var(--border); margin-bottom: 16px; }
+.quick-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
 .quick-chips { display: flex; flex-wrap: wrap; gap: 7px; }
-.quick-chip {
-  padding: 7px 14px; border-radius: 100px;
-  border: 1px solid var(--border2); background: var(--navy-card);
-  font-size: 12px; font-weight: 400; color: var(--text-dim);
-  cursor: pointer; font-family: var(--font-sans);
-  transition: all 0.2s; -webkit-tap-highlight-color: transparent;
-}
-.quick-chip:hover { border-color: var(--gold-border); color: var(--gold-light); background: var(--gold-dim); }
+.quick-chip { padding: 7px 14px; border-radius: 100px; border: 1px solid var(--border2); background: var(--bg2); font-size: 12px; color: var(--text-dim); cursor: pointer; font-family: var(--font); transition: all 0.15s; }
+.quick-chip:hover { border-color: var(--pink-border); color: var(--pink); background: var(--pink-dim); }
 
-/* ── Messages ── */
-.message { display: flex; gap: 11px; animation: fadeUp 0.3s ease both; opacity: 0; }
+/* Messages */
+.message { display: flex; gap: 10px; animation: fadeUp 0.25s ease both; opacity: 0; }
 .message.user { flex-direction: row-reverse; }
-.avatar {
-  width: 32px; height: 32px; border-radius: 9px;
-  flex-shrink: 0; display: grid; place-items: center; margin-top: 1px;
-}
-.message.bot .avatar {
-  background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.04));
-  border: 1px solid var(--gold-border);
-}
-.message.bot .avatar svg { width: 17px; height: 17px; }
-.message.user .avatar {
-  background: var(--navy-light); border: 1px solid var(--border2);
-  font-size: 11px; font-weight: 600; color: var(--text-dim); letter-spacing: 0.02em;
-}
-.msg-body { display: flex; flex-direction: column; max-width: 80%; }
-@media(min-width:560px){ .msg-body { max-width: 70%; } }
+.avatar { width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0; display: grid; place-items: center; margin-top: 2px; }
+.message.bot .avatar { background: var(--pink-dim); border: 1px solid var(--pink-border); }
+.message.user .avatar { background: var(--bg3); border: 1px solid var(--border2); font-size: 11px; font-weight: 600; color: var(--text-dim); }
+.msg-body { display: flex; flex-direction: column; max-width: 75%; }
 .message.user .msg-body { align-items: flex-end; }
-.bubble { padding: 13px 16px; font-size: 14px; line-height: 1.7; font-weight: 300; }
-.message.bot .bubble {
-  background: var(--navy-card); border: 1px solid var(--border);
-  border-radius: 3px var(--radius) var(--radius) var(--radius); color: var(--text);
-}
-.message.user .bubble {
-  background: linear-gradient(135deg, #063a52, #042d40);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: var(--radius) 3px var(--radius) var(--radius);
-  color: var(--text); font-weight: 400;
-}
-.message.bot .bubble h1, .message.bot .bubble h2, .message.bot .bubble h3 {
-  font-family: var(--font-serif); color: var(--gold-light);
-  margin: 10px 0 6px; font-size: 15px; font-weight: 600;
-}
-.message.bot .bubble strong { color: var(--gold-light); font-weight: 600; }
-.message.bot .bubble ul, .message.bot .bubble ol { padding-left: 18px; margin: 6px 0; }
-.message.bot .bubble li { margin-bottom: 5px; line-height: 1.6; color: var(--text); }
-.message.bot .bubble p { margin-bottom: 8px; }
+.bubble { padding: 12px 15px; font-size: 13.5px; line-height: 1.65; font-weight: 300; border-radius: 4px 12px 12px 12px; }
+.message.bot .bubble { background: var(--bg2); border: 1px solid var(--border2); color: var(--text); }
+.message.user .bubble { background: var(--pink); border-radius: 12px 4px 12px 12px; color: #fff; font-weight: 400; }
+.message.bot .bubble.sentiment-negative { border-left: 2px solid var(--red); background: #160808; border-top-color: var(--border2); border-right-color: var(--border2); border-bottom-color: var(--border2); }
+.message.bot .bubble.sentiment-positive { border-left: 2px solid var(--green); background: #061308; border-top-color: var(--border2); border-right-color: var(--border2); border-bottom-color: var(--border2); }
+.urgent-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(248,113,113,0.10); border: 1px solid rgba(248,113,113,0.2); border-radius: 100px; padding: 2px 9px; font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--red); margin-bottom: 8px; }
+.positive-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); border-radius: 100px; padding: 2px 9px; font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--green); margin-bottom: 8px; }
+.empathy-note { background: rgba(248,113,113,0.07); border: 1px solid rgba(248,113,113,0.15); border-radius: 7px; padding: 8px 11px; font-size: 12px; color: #fca5a5; margin-bottom: 10px; line-height: 1.5; }
+.message.bot .bubble strong { color: var(--pink); font-weight: 500; }
+.message.bot .bubble ul, .message.bot .bubble ol { padding-left: 16px; margin: 5px 0; }
+.message.bot .bubble li { margin-bottom: 4px; color: var(--text); font-size: 13px; }
+.message.bot .bubble p { margin-bottom: 6px; }
 .message.bot .bubble p:last-child { margin-bottom: 0; }
-.message.bot .bubble hr { border: none; border-top: 1px solid var(--border2); margin: 10px 0; }
-
-/* ── Sentiment styles ── */
-.message.bot .bubble.sentiment-negative {
-  border-left: 3px solid #f87171;
-  background: linear-gradient(135deg, #1a0a0a, #061a2d);
-}
-.message.bot .bubble.sentiment-positive {
-  border-left: 3px solid #4ade80;
-  background: linear-gradient(135deg, #071a0e, #061a2d);
-}
-.empathy-note {
-  display: flex; align-items: flex-start; gap: 8px;
-  background: rgba(248,113,113,0.08);
-  border: 1px solid rgba(248,113,113,0.2);
-  border-radius: 8px; padding: 8px 12px;
-  font-size: 12.5px; color: #fca5a5;
-  margin-bottom: 10px; line-height: 1.5;
-}
-.sentiment-badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
-  text-transform: uppercase; padding: 2px 8px;
-  border-radius: 100px; margin-bottom: 8px;
-}
-.sentiment-badge.negative { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
-.sentiment-badge.positive { background: rgba(74,222,128,0.10); color: #4ade80; border: 1px solid rgba(74,222,128,0.22); }
-.sentiment-badge.neutral  { display: none; }
-.msg-time { font-size: 10px; color: var(--text-muted); margin-top: 5px; padding: 0 3px; letter-spacing: 0.04em; }
+.msg-time { font-size: 10px; color: var(--text-muted); margin-top: 5px; padding: 0 2px; }
 .msg-actions { display: flex; align-items: center; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
-.act-btn {
-  background: var(--navy-card); border: 1px solid var(--border);
-  border-radius: 7px; padding: 4px 10px; cursor: pointer;
-  font-size: 11.5px; font-weight: 400; color: var(--text-dim);
-  font-family: var(--font-sans); display: flex; align-items: center; gap: 4px;
-  transition: all 0.18s; min-height: 26px; -webkit-tap-highlight-color: transparent;
-  letter-spacing: 0.01em;
-}
-.act-btn:hover { color: var(--text); border-color: var(--border2); background: var(--navy-hover); }
-.act-btn.copied { color: #4ade80; border-color: rgba(74,222,128,0.25); background: rgba(74,222,128,0.05); }
-.act-btn.good { color: #4ade80; border-color: rgba(74,222,128,0.25); }
-.act-btn.bad { color: var(--danger); border-color: rgba(248,113,113,0.25); }
-/* NEW: TTS playing state */
-.act-btn.playing { color: var(--gold-light); border-color: var(--gold-border); background: var(--gold-dim); }
-.followups { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
-.followup-chip {
-  padding: 6px 12px; border-radius: 100px;
-  border: 1px solid var(--border2); background: var(--navy-mid);
-  font-size: 12px; font-weight: 400; color: var(--text-dim);
-  cursor: pointer; font-family: var(--font-sans); transition: all 0.18s;
-  -webkit-tap-highlight-color: transparent;
-}
-.followup-chip:hover { border-color: var(--gold-border); color: var(--gold-light); background: var(--gold-dim); }
-.error-bubble {
-  background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.2);
-  border-radius: 3px var(--radius) var(--radius) var(--radius);
-  color: var(--danger); padding: 13px 16px; font-size: 14px; font-weight: 300;
-  line-height: 1.6; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-}
-.retry-btn {
-  background: rgba(248,113,113,0.12); color: var(--danger);
-  border: 1px solid rgba(248,113,113,0.25); border-radius: 7px;
-  padding: 4px 12px; font-size: 12px; font-weight: 500;
-  cursor: pointer; font-family: var(--font-sans); transition: all 0.2s;
-}
-.retry-btn:hover { background: rgba(248,113,113,0.2); }
-.typing .bubble { display: flex; align-items: center; gap: 6px; padding: 18px 20px; }
-.dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text-dim2); animation: bounce 1.2s ease infinite; }
-.dot:nth-child(2){animation-delay:.18s;} .dot:nth-child(3){animation-delay:.36s;}
-
-/* NEW: language detection banner */
-.lang-detected-banner {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--gold-dim); border: 1px solid var(--gold-border);
-  border-radius: var(--radius-sm); padding: 7px 14px;
-  font-size: 12px; color: var(--gold-light);
-  animation: fadeUp 0.3s ease both;
-}
-.lang-detected-banner button {
-  background: none; border: none; color: var(--gold-light);
-  font-size: 11px; text-decoration: underline; cursor: pointer;
-  font-family: var(--font-sans); padding: 0; margin-left: auto;
-  opacity: 0.7;
-}
+.act-btn { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 11px; font-weight: 400; color: var(--text-dim); font-family: var(--font); display: flex; align-items: center; gap: 4px; transition: all 0.15s; }
+.act-btn:hover { color: var(--text); border-color: var(--border2); }
+.act-btn.playing { color: var(--pink); border-color: var(--pink-border); background: var(--pink-dim); }
+.act-btn.copied { color: var(--green); border-color: rgba(74,222,128,0.25); }
+.followups { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.followup-chip { padding: 5px 12px; border-radius: 100px; border: 1px solid var(--border2); background: var(--bg2); font-size: 11.5px; color: var(--text-dim); cursor: pointer; font-family: var(--font); transition: all 0.15s; }
+.followup-chip:hover { border-color: var(--pink-border); color: var(--pink); background: var(--pink-dim); }
+.error-bubble { background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.18); border-radius: 4px 12px 12px 12px; color: var(--red); padding: 12px 15px; font-size: 13px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.retry-btn { background: rgba(248,113,113,0.1); color: var(--red); border: 1px solid rgba(248,113,113,0.22); border-radius: 6px; padding: 3px 10px; font-size: 11px; font-weight: 500; cursor: pointer; font-family: var(--font); }
+.typing .bubble { display: flex; align-items: center; gap: 5px; padding: 16px 18px; }
+.dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text-muted); animation: bounce 1.1s ease infinite; }
+.dot:nth-child(2) { animation-delay: .16s; } .dot:nth-child(3) { animation-delay: .32s; }
+.lang-detected-banner { display: flex; align-items: center; gap: 8px; background: var(--pink-dim); border: 1px solid var(--pink-border); border-radius: 8px; padding: 7px 13px; font-size: 12px; color: var(--pink); animation: fadeUp 0.3s ease both; }
+.lang-detected-banner button { background: none; border: none; color: var(--pink); font-size: 11px; text-decoration: underline; cursor: pointer; font-family: var(--font); padding: 0; margin-left: auto; opacity: 0.7; }
 .lang-detected-banner button:hover { opacity: 1; }
 
-/* ── Autocomplete ── */
-.autocomplete { width:100%; max-width:820px; padding:0 20px; display:none; }
-@media(min-width:560px){.autocomplete{padding:0 28px;}}
-.autocomplete.visible{display:block;}
-.autocomplete-inner { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
-.autocomplete-inner::-webkit-scrollbar{display:none;}
-.ac-chip {
-  padding:5px 12px; border-radius:100px;
-  border:1px solid var(--border2); background:var(--navy-card);
-  font-size:12px; font-weight:400; color:var(--text-dim);
-  cursor:pointer; white-space:nowrap; font-family:var(--font-sans);
-  flex-shrink:0; transition:all 0.18s; -webkit-tap-highlight-color:transparent;
-}
-.ac-chip:hover { color:var(--gold-light); border-color:var(--gold-border); background:var(--gold-dim); }
+/* Autocomplete */
+.autocomplete { width: 100%; max-width: 780px; padding: 0 20px; display: none; }
+.autocomplete.visible { display: block; }
+.autocomplete-inner { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.autocomplete-inner::-webkit-scrollbar { display: none; }
+.ac-chip { padding: 5px 12px; border-radius: 100px; border: 1px solid var(--border2); background: var(--bg2); font-size: 11.5px; color: var(--text-dim); cursor: pointer; white-space: nowrap; font-family: var(--font); flex-shrink: 0; transition: all 0.15s; }
+.ac-chip:hover { color: var(--pink); border-color: var(--pink-border); background: var(--pink-dim); }
 
-/* ── Input area ── */
-.input-area {
-  flex-shrink: 0;
-  padding: 10px 20px calc(env(safe-area-inset-bottom,0px) + 14px);
-  border-top: 1px solid var(--border);
-  background: rgba(3,15,24,0.96);
-  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-  animation: slideUp 0.7s 0.25s cubic-bezier(0.22,1,0.36,1) both; opacity:0;
-}
-@media(min-width:560px){ .input-area { padding: 12px 28px calc(env(safe-area-inset-bottom,0px)+18px); } }
-.input-box {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--navy-card); border: 1px solid var(--border2);
-  border-radius: 14px; padding: 9px 9px 9px 16px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-@media(min-width:560px){ .input-box { border-radius: 16px; padding: 10px 10px 10px 18px; } }
-.input-box:focus-within {
-  border-color: var(--gold-border);
-  box-shadow: 0 0 0 3px rgba(45,212,191,0.08), 0 2px 16px rgba(0,0,0,0.3);
-}
-#userInput {
-  flex:1; background:none; border:none; outline:none;
-  font-family:var(--font-sans); font-size:14px; font-weight:300;
-  color:var(--text); resize:none; max-height:120px; line-height:1.6;
-}
-#userInput::placeholder { color:var(--text-muted); }
-#micBtn {
-  width:36px; height:36px; min-width:36px; border-radius:9px;
-  background:var(--navy-mid); border:1px solid var(--border2);
-  cursor:pointer; display:grid; place-items:center; flex-shrink:0;
-  transition:all 0.18s; -webkit-tap-highlight-color:transparent;
-}
-#micBtn:hover { border-color:var(--gold-border); background:var(--gold-dim); }
-#micBtn.listening { background:var(--gold-dim); border-color:var(--gold-border); box-shadow:0 0 14px rgba(45,212,191,0.25); animation:pulse 1s ease infinite; }
-#sendBtn {
-  width:36px; height:36px; min-width:36px; border-radius:9px;
-  background: linear-gradient(135deg, #2dd4bf, #0e9a8a);
-  border:none; cursor:pointer; display:grid; place-items:center; flex-shrink:0;
-  transition:all 0.18s; -webkit-tap-highlight-color:transparent;
-  box-shadow: 0 2px 10px rgba(45,212,191,0.28);
-}
-#sendBtn:hover { transform:scale(1.05); box-shadow:0 4px 16px rgba(45,212,191,0.4); }
-#sendBtn:active { transform:scale(0.96); }
-#sendBtn:disabled { background:var(--navy-light); box-shadow:none; cursor:not-allowed; transform:none; }
-.input-hint { text-align:center; font-size:10.5px; color:var(--text-muted); margin-top:8px; display:none; letter-spacing:0.04em; font-weight:300; }
-@media(min-width:600px){ .input-hint{display:block;} }
-.toast {
-  position:fixed; bottom:80px; left:50%;
-  transform:translateX(-50%) translateY(14px);
-  background:var(--navy-mid); border:1px solid var(--gold-border);
-  color:var(--gold-light); font-size:12px; font-weight:500;
-  padding:7px 16px; border-radius:100px;
-  opacity:0; transition:all 0.25s; pointer-events:none; z-index:999;
-  white-space:nowrap; letter-spacing:0.04em;
-  box-shadow:0 4px 20px rgba(0,0,0,0.4);
-}
-.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-@keyframes slideDown { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
-@keyframes slideUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+/* Input */
+.input-area { flex-shrink: 0; padding: 10px 20px calc(env(safe-area-inset-bottom, 0px) + 14px); border-top: 1px solid var(--border); background: var(--bg); }
+.input-box { display: flex; align-items: center; gap: 8px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 12px; padding: 8px 8px 8px 14px; transition: border-color 0.2s; }
+.input-box:focus-within { border-color: var(--pink-border); }
+#userInput { flex: 1; background: none; border: none; outline: none; font-family: var(--font); font-size: 14px; font-weight: 300; color: var(--text); resize: none; max-height: 120px; line-height: 1.5; }
+#userInput::placeholder { color: var(--text-muted); }
+#micBtn { width: 34px; height: 34px; border-radius: 8px; background: var(--bg3); border: 1px solid var(--border2); cursor: pointer; display: grid; place-items: center; flex-shrink: 0; transition: all 0.15s; color: var(--text-dim); }
+#micBtn:hover { border-color: var(--pink-border); color: var(--pink); }
+#micBtn.listening { background: var(--pink-dim); border-color: var(--pink-border); color: var(--pink); animation: pulse 1s ease infinite; }
+#sendBtn { width: 34px; height: 34px; border-radius: 8px; background: var(--pink); border: none; cursor: pointer; display: grid; place-items: center; flex-shrink: 0; transition: all 0.15s; }
+#sendBtn:hover { opacity: 0.88; } #sendBtn:active { transform: scale(0.95); } #sendBtn:disabled { background: var(--bg4); cursor: not-allowed; }
+.input-hint { text-align: center; font-size: 10px; color: var(--text-muted); margin-top: 7px; display: none; }
+@media(min-width:580px) { .input-hint { display: block; } }
+.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--bg3); border: 1px solid var(--pink-border); color: var(--pink); font-size: 12px; font-weight: 500; padding: 6px 14px; border-radius: 100px; opacity: 0; transition: all 0.2s; pointer-events: none; z-index: 999; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
 </style>
 </head>
 <body>
 <div class="shell">
-
-  <!-- ── Header ── -->
   <header>
     <div class="logo">
-      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="5" width="16" height="11" rx="3" stroke="#2dd4bf" stroke-width="1.4"/>
-        <path d="M6 9h3M6 12h2" stroke="#2dd4bf" stroke-width="1.4" stroke-linecap="round"/>
-        <rect x="13" y="9.5" width="2.5" height="2.5" rx="0.8" fill="#2dd4bf" opacity="0.7"/>
-        <path d="M2 8h16" stroke="#2dd4bf" stroke-width="1.2" opacity="0.4"/>
+      <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
+        <rect x="2" y="5" width="16" height="11" rx="3" stroke="#ff0080" stroke-width="1.4"/>
+        <path d="M6 9h3M6 12h2" stroke="#ff0080" stroke-width="1.4" stroke-linecap="round"/>
+        <rect x="13" y="9.5" width="2.5" height="2.5" rx=".8" fill="#ff0080" opacity=".7"/>
+        <path d="M2 8h16" stroke="#ff0080" stroke-width="1.2" opacity=".4"/>
       </svg>
     </div>
-    <div class="header-divider"></div>
     <div class="brand">
       <div class="brand-name">National Banking Services</div>
-      <div class="brand-sub">Intelligent Support Assistant</div>
+      <div class="brand-sub">Support Assistant</div>
     </div>
-    <div class="header-actions">
-
-      <!-- Language toggle with auto-detect dot -->
-      <div class="lang-toggle" title="Language / भाषा">
+    <div class="header-right">
+      <div class="lang-toggle">
         <button class="lang-btn active" id="btnEn" onclick="setLangManual('en')">EN</button>
         <button class="lang-btn" id="btnHi" onclick="setLangManual('hi')">हि</button>
-        <!-- glowing dot appears when auto-detect is active -->
-        <div class="lang-auto-dot" id="langAutoDot" title="Auto-detecting language"></div>
+        <div class="lang-auto-dot" id="langAutoDot"></div>
       </div>
-
-      <div class="status-badge">
-        <span class="status-pulse"></span>Online
-      </div>
-      <button class="icon-btn" onclick="clearChat()" title="Clear conversation">
-        <svg viewBox="0 0 18 18" fill="none" stroke="rgba(232,237,245,0.45)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+      <div class="online-badge"><div class="online-dot"></div>Online</div>
+      <button class="clear-btn" onclick="clearChat()" title="Clear chat">
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="3 6 4.5 16.5 13.5 16.5 15 6"/>
           <path d="M6 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
           <line x1="1.5" y1="6" x2="16.5" y2="6"/>
@@ -524,20 +170,17 @@ header {
     </div>
   </header>
 
-  <!-- ── Chat ── -->
   <div class="chat-wrap" id="chatWrap"></div>
 
-  <!-- ── Autocomplete ── -->
   <div class="autocomplete" id="autocomplete">
     <div class="autocomplete-inner" id="autocompleteInner"></div>
   </div>
 
-  <!-- ── Input ── -->
   <div class="input-area">
     <div class="input-box">
-      <textarea id="userInput" rows="1" placeholder="Ask about your banking needs…"></textarea>
-      <button id="micBtn" onclick="toggleVoice()" title="Voice input / वॉयस इनपुट">
-        <svg viewBox="0 0 18 18" fill="none" stroke="rgba(232,237,245,0.4)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+      <textarea id="userInput" rows="1" placeholder="Ask anything about your banking…"></textarea>
+      <button id="micBtn" onclick="toggleVoice()" title="Voice input">
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
           <rect x="6" y="1" width="6" height="9" rx="3"/>
           <path d="M3 8a6 6 0 0 0 12 0"/>
           <line x1="9" y1="17" x2="9" y2="14"/>
@@ -545,241 +188,141 @@ header {
         </svg>
       </button>
       <button id="sendBtn" onclick="sendMessage()">
-        <svg viewBox="0 0 18 18" fill="none" stroke="#03101a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="16" y1="2" x2="8" y2="10"/>
           <polygon points="16 2 11 16 8 10 2 7 16 2"/>
         </svg>
       </button>
     </div>
-    <p class="input-hint">Press Enter to send · Shift+Enter for new line · Mic for voice input · 🌐 Auto language detection</p>
+    <p class="input-hint">Enter to send · Shift+Enter for new line · Mic for voice</p>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const chatWrap       = document.getElementById('chatWrap');
-const userInput      = document.getElementById('userInput');
-const sendBtn        = document.getElementById('sendBtn');
+const chatWrap = document.getElementById('chatWrap');
+const userInput = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
 const autocompleteEl = document.getElementById('autocomplete');
 const autocompleteInner = document.getElementById('autocompleteInner');
-const langAutoDot    = document.getElementById('langAutoDot');
+const langAutoDot = document.getElementById('langAutoDot');
 
-const API_URL     = 'https://support-agent-production-ce11.up.railway.app/chat';
-const TTS_URL     = 'https://support-agent-production-ce11.up.railway.app/tts';
-const DETECT_URL  = 'https://support-agent-production-ce11.up.railway.app/detect-language';
-const sessionId   = 'user_' + Math.random().toString(36).slice(2, 9);
-const STORAGE_KEY = 'nbs_pro_v2';
+const API_URL    = 'https://support-agent-production-ce11.up.railway.app/chat';
+const TTS_URL    = 'https://support-agent-production-ce11.up.railway.app/tts';
+const DETECT_URL = 'https://support-agent-production-ce11.up.railway.app/detect-language';
+const sessionId  = 'user_' + Math.random().toString(36).slice(2, 9);
+const STORAGE_KEY = 'nbs_v3';
 
-// ── Language state ──────────────────────────────────────────────────────────
-// langMode: 'auto' | 'manual'
-// lang: 'en' | 'hi'  (current active language for UI)
-let langMode = localStorage.getItem('nbs_lang_mode') || 'auto';
-let lang     = localStorage.getItem('nbs_lang') || 'en';
-
-// Track current TTS audio so we can stop it
+let langMode = sessionStorage.getItem('nbs_lang_mode') || 'auto';
+let lang     = sessionStorage.getItem('nbs_lang') || 'en';
 let currentAudio = null;
 
-// ── i18n strings ────────────────────────────────────────────────────────────
 const I18N = {
   en: {
-    placeholder: 'How can we assist you today?',
-    h2: 'Your trusted<br><span>banking partner</span>',
-    sub: 'Get instant answers on accounts, loans, interest rates, fees, and all banking services.',
-    primary_label: 'Popular Services', secondary_label: 'More Options',
-    primary: [
-      { icon: 'savings', label: 'Savings Account', desc: 'Competitive rates & exclusive benefits tailored for you', query: 'Tell me about savings account rates and benefits' },
-      { icon: 'loan',    label: 'Loan Services',   desc: 'Quick approvals with flexible repayment options',        query: 'How do I apply for a loan and what are the requirements?' },
+    placeholder: 'Ask anything about your banking…',
+    h1: 'Hi there 👋',
+    h2: 'How can we <span>help you</span> today?',
+    sub: 'Ask me anything about accounts, loans, transfers, or any banking service.',
+    cards: [
+      { label: 'Savings Account', desc: 'Rates, benefits & how to open', query: 'Tell me about savings account rates and benefits' },
+      { label: 'Loans & Credit',  desc: 'Apply, eligibility & EMI',      query: 'How do I apply for a loan and what are the requirements?' },
     ],
-    secondary: [
-      { icon: 'deposit', label: 'Fixed Deposits', desc: 'Assured returns',  query: 'What are the fixed deposit interest rates and tenure options?' },
-      { icon: 'card',    label: 'Credit Cards',   desc: 'Fees & rewards',   query: 'Tell me about credit card fees, rewards, and how to apply' },
-    ],
-    quick_label: 'Frequently Asked',
-    quick: ['Minimum balance requirements', 'Reset PIN / password', 'Transfer limits & fees', 'Net banking setup', 'ATM withdrawal limit', 'Close my account'],
-    listening: 'Listening…', conn_error: 'Connection error. Please check your internet and try again.',
-    copied: 'Copied', retry: 'Retry',
-    lang_detected: '🌐 Hindi detected — switching to हिंदी',
-    lang_switch_back: 'Switch back to English',
+    quick_label: 'Quick questions',
+    quick: ['Minimum balance?', 'Reset my PIN'],
     followups: {
-      savings: ['Minimum balance?', 'How to open savings account?', 'Is interest taxable?'],
-      loan:    ['Documents required?', 'Interest rate?', 'Approval timeline?'],
+      savings: ['Min balance?', 'How to open?', 'Interest taxable?'],
+      loan:    ['Documents needed?', 'Interest rate?', 'Approval time?'],
       credit:  ['How to apply?', 'Credit limit?', 'Annual fee?'],
-      deposit: ['Minimum deposit amount?', 'Early withdrawal penalty?', 'Auto-renewal?'],
-      account: ['Documents required?', 'Processing time?', 'Minimum balance?'],
-      default: ['Tell me more', 'What are the applicable fees?', 'How do I proceed?']
-    }
+      default: ['Tell me more', 'What are the fees?', 'How do I proceed?']
+    },
+    listening: 'Listening…', conn_error: 'Connection error. Please check your internet.', copied: 'Copied', retry: 'Retry',
   },
   hi: {
-    placeholder: 'आज हम आपकी कैसे सहायता कर सकते हैं?',
-    h2: 'आपका विश्वसनीय<br><span>बैंकिंग साझेदार</span>',
-    sub: 'खाते, लोन, ब्याज दर, शुल्क या किसी भी बैंकिंग सेवा के बारे में तत्काल उत्तर पाएं।',
-    primary_label: 'लोकप्रिय सेवाएं', secondary_label: 'अन्य विकल्प',
-    primary: [
-      { icon: 'savings', label: 'बचत खाता',   desc: 'प्रतिस्पर्धी दरें और विशेष लाभ',             query: 'बचत खाते की ब्याज दर और लाभ बताएं' },
-      { icon: 'loan',    label: 'लोन सेवाएं', desc: 'त्वरित अनुमोदन और लचीला पुनर्भुगतान',        query: 'लोन के लिए कैसे आवेदन करें?' },
+    placeholder: 'बैंकिंग से जुड़ा कोई भी सवाल पूछें…',
+    h1: 'नमस्ते 👋',
+    h2: 'आज हम आपकी <span>कैसे मदद</span> करें?',
+    sub: 'खाते, लोन, ट्रांसफर या किसी भी बैंकिंग सेवा के बारे में पूछें।',
+    cards: [
+      { label: 'बचत खाता',        desc: 'दरें, लाभ और खाता खोलने की प्रक्रिया', query: 'बचत खाते की ब्याज दर और लाभ बताएं' },
+      { label: 'लोन और क्रेडिट', desc: 'आवेदन, पात्रता और EMI',                 query: 'लोन के लिए कैसे आवेदन करें?' },
     ],
-    secondary: [
-      { icon: 'deposit', label: 'फिक्स्ड डिपॉजिट', desc: 'सुनिश्चित रिटर्न', query: 'फिक्स्ड डिपॉजिट की ब्याज दरें?' },
-      { icon: 'card',    label: 'क्रेडिट कार्ड',   desc: 'शुल्क और पुरस्कार', query: 'क्रेडिट कार्ड के शुल्क और लाभ?' },
-    ],
-    quick_label: 'सामान्य प्रश्न',
-    quick: ['न्यूनतम बैलेंस', 'पिन रीसेट', 'ट्रांसफर सीमा', 'नेट बैंकिंग', 'ATM लिमिट', 'खाता बंद करें'],
-    listening: 'सुन रहा हूँ…', conn_error: 'कनेक्शन त्रुटि। कृपया अपना इंटरनेट जाँचें।',
-    copied: 'कॉपी हो गया', retry: 'पुनः प्रयास',
-    lang_detected: '🌐 English detected — switching to English',
-    lang_switch_back: 'हिंदी पर वापस जाएं',
+    quick_label: 'जल्दी पूछें',
+    quick: ['न्यूनतम बैलेंस?', 'पिन रीसेट'],
     followups: {
       savings: ['न्यूनतम बैलेंस?', 'खाता कैसे खोलें?', 'ब्याज पर टैक्स?'],
       loan:    ['दस्तावेज़?', 'ब्याज दर?', 'अनुमोदन समय?'],
       credit:  ['कैसे आवेदन करें?', 'क्रेडिट लिमिट?', 'वार्षिक शुल्क?'],
-      deposit: ['न्यूनतम जमा?', 'समय से पहले निकासी?', 'ऑटो-नवीनीकरण?'],
-      account: ['दस्तावेज़?', 'कितना समय?', 'न्यूनतम बैलेंस?'],
-      default: ['और विवरण दें', 'शुल्क क्या हैं?', 'कैसे आगे बढ़ें?']
-    }
+      default: ['और बताएं', 'शुल्क क्या हैं?', 'कैसे आगे बढ़ें?']
+    },
+    listening: 'सुन रहा हूँ…', conn_error: 'कनेक्शन त्रुटि। इंटरनेट जाँचें।', copied: 'कॉपी हो गया', retry: 'पुनः प्रयास',
   }
 };
 
-const ICONS = {
-  savings: `<svg viewBox="0 0 16 16" fill="none" stroke="#2dd4bf" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M2 9a6 6 0 1 1 10.4 4H2V9z"/><path d="M6 13v2M10 13v2"/><path d="M8 5v2M7 7h2"/></svg>`,
-  loan:    `<svg viewBox="0 0 16 16" fill="none" stroke="#2dd4bf" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="1" y="4" width="14" height="9" rx="2"/><path d="M1 7h14"/><path d="M5 11h2M9 11h2"/></svg>`,
-  deposit: `<svg viewBox="0 0 16 16" fill="none" stroke="rgba(226,240,249,0.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M8 1v10M5 8l3 3 3-3"/><path d="M2 13h12"/></svg>`,
-  card:    `<svg viewBox="0 0 16 16" fill="none" stroke="rgba(226,240,249,0.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="1" y="3" width="14" height="10" rx="2"/><path d="M1 7h14"/><circle cx="4.5" cy="11" r="1" fill="rgba(226,240,249,0.35)" stroke="none"/></svg>`,
-  bot:     `<svg viewBox="0 0 20 20" fill="none" stroke="#2dd4bf" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><rect x="3" y="6" width="14" height="10" rx="3"/><path d="M10 2v4"/><circle cx="10" cy="2" r="1.2" fill="#2dd4bf" stroke="none"/><circle cx="7" cy="11" r="1.2" fill="#2dd4bf" stroke="none" opacity="0.7"/><circle cx="13" cy="11" r="1.2" fill="#2dd4bf" stroke="none" opacity="0.7"/><path d="M7 15h6" stroke-opacity="0.6"/></svg>`,
-};
-const ARROW_SVG = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11L11 3M5 3h6v6"/></svg>`;
-
-// ── Language helpers ─────────────────────────────────────────────────────────
-
 function t() { return I18N[lang]; }
 
-function applyLang(newLang, mode) {
-  lang     = newLang;
-  langMode = mode;
-  localStorage.setItem('nbs_lang', lang);
-  localStorage.setItem('nbs_lang_mode', langMode);
+const BOT_ICON = `<svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#ff0080" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="10" rx="3"/><path d="M10 2v4"/><circle cx="10" cy="2" r="1.2" fill="#ff0080" stroke="none"/><circle cx="7" cy="11" r="1.2" fill="#ff0080" stroke="none" opacity=".7"/><circle cx="13" cy="11" r="1.2" fill="#ff0080" stroke="none" opacity=".7"/></svg>`;
 
+function applyLang(newLang, mode) {
+  lang = newLang; langMode = mode;
+  sessionStorage.setItem('nbs_lang', lang); sessionStorage.setItem('nbs_lang_mode', langMode);
   document.getElementById('btnEn').classList.toggle('active', lang === 'en');
   document.getElementById('btnHi').classList.toggle('active', lang === 'hi');
-  // Show glowing dot only when auto-detect is active
   langAutoDot.classList.toggle('visible', langMode === 'auto');
   userInput.placeholder = t().placeholder;
 }
 
 function setLangManual(l) {
-  // User explicitly clicked a toggle button → manual mode, no auto-detect
   applyLang(l, 'manual');
-  const w = document.getElementById('welcome');
-  if (w) { w.remove(); renderWelcome(); }
+  const w = document.getElementById('welcome'); if (w) { w.remove(); renderWelcome(); }
 }
 
-// Detect language via backend, then auto-switch if in auto mode
 async function autoDetectLang(text) {
-  if (langMode === 'manual') return lang;  // respect manual override
-  if (text.length < 4) return lang;        // too short to detect reliably
+  if (langMode === 'manual' || text.length < 4) return lang;
   try {
-    const res = await fetch(DETECT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text })
-    });
+    const res = await fetch(DETECT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
     const data = await res.json();
     const detected = data.detected_lang || 'en';
-    if (detected !== lang) {
-      // Show banner before switching
-      showLangDetectedBanner(detected);
-      applyLang(detected, 'auto');
-    }
+    if (detected !== lang) { showLangBanner(detected); applyLang(detected, 'auto'); }
     return detected;
-  } catch {
-    return lang;
-  }
+  } catch { return lang; }
 }
 
-function showLangDetectedBanner(detectedLang) {
-  // Remove any existing banner
+function showLangBanner(detected) {
   document.querySelectorAll('.lang-detected-banner').forEach(b => b.remove());
-  const banner = document.createElement('div');
-  banner.className = 'lang-detected-banner';
-  const oppositeLang = detectedLang === 'hi' ? 'en' : 'hi';
-  banner.innerHTML = `
-    <span>${detectedLang === 'hi' ? '🌐 हिंदी detected — switching to हिंदी' : '🌐 English detected — switching to English'}</span>
-    <button onclick="setLangManual('${oppositeLang}'); this.closest('.lang-detected-banner').remove();">
-      ${detectedLang === 'hi' ? 'Keep English' : 'हिंदी रखें'}
-    </button>
-  `;
-  chatWrap.appendChild(banner);
-  chatWrap.scrollTop = chatWrap.scrollHeight;
-  setTimeout(() => banner.remove(), 5000);
-}
-
-// ── TTS ──────────────────────────────────────────────────────────────────────
-
-async function speakText(text, btnEl, ttsLang) {
-  // Stop any currently playing audio
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio = null;
-    // Reset all playing buttons
-    document.querySelectorAll('.act-btn.playing').forEach(b => {
-      b.classList.remove('playing');
-      b.innerHTML = speakerIcon() + ' Listen';
-    });
-    if (btnEl.dataset.wasPlaying === 'true') {
-      btnEl.dataset.wasPlaying = '';
-      return; // toggle off
-    }
-  }
-
-  btnEl.classList.add('playing');
-  btnEl.innerHTML = speakerIcon() + ' Playing…';
-  btnEl.dataset.wasPlaying = 'true';
-
-  try {
-    const res = await fetch(TTS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: text.slice(0, 500), lang: ttsLang })  // limit chars
-    });
-    if (!res.ok) throw new Error('TTS failed');
-    const blob = await res.blob();
-    const url  = URL.createObjectURL(blob);
-    const audio = new Audio(url);
-    currentAudio = audio;
-    audio.play();
-    audio.onended = () => {
-      btnEl.classList.remove('playing');
-      btnEl.innerHTML = speakerIcon() + ' Listen';
-      btnEl.dataset.wasPlaying = '';
-      currentAudio = null;
-      URL.revokeObjectURL(url);
-    };
-  } catch {
-    btnEl.classList.remove('playing');
-    btnEl.innerHTML = speakerIcon() + ' Listen';
-    btnEl.dataset.wasPlaying = '';
-    // Fallback to browser TTS if API fails
-    if ('speechSynthesis' in window) {
-      const utt = new SpeechSynthesisUtterance(text.slice(0, 300));
-      utt.lang = ttsLang === 'hi' ? 'hi-IN' : 'en-IN';
-      window.speechSynthesis.speak(utt);
-    } else {
-      showToast('TTS not available');
-    }
-  }
+  const b = document.createElement('div'); b.className = 'lang-detected-banner';
+  const opp = detected === 'hi' ? 'en' : 'hi';
+  b.innerHTML = `<span>${detected === 'hi' ? '🌐 Hindi detected' : '🌐 English detected'}</span>
+    <button onclick="setLangManual('${opp}');this.closest('.lang-detected-banner').remove();">${detected === 'hi' ? 'Keep English' : 'हिंदी रखें'}</button>`;
+  chatWrap.appendChild(b); chatWrap.scrollTop = chatWrap.scrollHeight;
+  setTimeout(() => b.remove(), 5000);
 }
 
 function speakerIcon() {
   return `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`;
 }
 
-// ── Utilities ────────────────────────────────────────────────────────────────
-
-function showToast(msg) {
-  const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2000);
+async function speakText(text, btn, ttsLang) {
+  if (currentAudio) {
+    currentAudio.pause(); currentAudio = null;
+    document.querySelectorAll('.act-btn.playing').forEach(b => { b.classList.remove('playing'); b.innerHTML = speakerIcon() + ' Listen'; });
+    if (btn.dataset.wasPlaying === 'true') { btn.dataset.wasPlaying = ''; return; }
+  }
+  btn.classList.add('playing'); btn.innerHTML = speakerIcon() + ' Playing…'; btn.dataset.wasPlaying = 'true';
+  try {
+    const res = await fetch(TTS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text.slice(0, 500), lang: ttsLang }) });
+    if (!res.ok) throw new Error();
+    const blob = await res.blob(); const url = URL.createObjectURL(blob);
+    const audio = new Audio(url); currentAudio = audio; audio.play();
+    audio.onended = () => { btn.classList.remove('playing'); btn.innerHTML = speakerIcon() + ' Listen'; btn.dataset.wasPlaying = ''; currentAudio = null; URL.revokeObjectURL(url); };
+  } catch {
+    btn.classList.remove('playing'); btn.innerHTML = speakerIcon() + ' Listen'; btn.dataset.wasPlaying = '';
+    if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(text.slice(0, 300)); u.lang = ttsLang === 'hi' ? 'hi-IN' : 'en-IN'; window.speechSynthesis.speak(u); }
+  }
 }
-function getTime() { return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
+
+function showToast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2000); }
+function getTime() { return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
 
 function saveHistory() {
   const msgs = [];
@@ -787,14 +330,14 @@ function saveHistory() {
     const role = m.classList.contains('user') ? 'user' : 'bot';
     const text = m.querySelector('.bubble')?.dataset.raw || m.querySelector('.bubble')?.textContent || '';
     const time = m.querySelector('.msg-time')?.textContent || '';
-    if (text) msgs.push({role,text,time});
+    if (text) msgs.push({ role, text, time });
   });
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(msgs)); } catch(e){}
+  try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(msgs)); } catch(e) {}
 }
 
 function loadHistory() {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = sessionStorage.getItem(STORAGE_KEY);
     if (!saved) return false;
     const msgs = JSON.parse(saved);
     if (!msgs.length) return false;
@@ -805,337 +348,153 @@ function loadHistory() {
 
 function getFollowups(text) {
   const lo = text.toLowerCase(), fu = t().followups;
-  if (lo.includes('saving')||lo.includes('बचत'))    return fu.savings;
-  if (lo.includes('loan')||lo.includes('लोन'))      return fu.loan;
-  if (lo.includes('credit')||lo.includes('क्रेडिट')) return fu.credit;
-  if (lo.includes('deposit')||lo.includes('fixed')||lo.includes('डिपॉज़िट')) return fu.deposit;
-  if (lo.includes('account')||lo.includes('खाता'))  return fu.account;
+  if (lo.includes('saving') || lo.includes('बचत'))    return fu.savings;
+  if (lo.includes('loan')   || lo.includes('लोन'))    return fu.loan;
+  if (lo.includes('credit') || lo.includes('क्रेडिट')) return fu.credit;
   return fu.default;
 }
 
-// ── Message rendering ────────────────────────────────────────────────────────
-
 function addMessage(text, role, timeStr, silent, sentiment, empathyNote) {
-  const welcome = document.getElementById('welcome');
-  if (welcome) welcome.remove();
-
+  const welcome = document.getElementById('welcome'); if (welcome) welcome.remove();
   const msg    = document.createElement('div'); msg.className = `message ${role}`;
   const av     = document.createElement('div'); av.className = 'avatar';
-  if (role === 'bot') av.innerHTML = ICONS.bot; else av.textContent = 'U';
+  if (role === 'bot') av.innerHTML = BOT_ICON; else av.textContent = 'U';
   const body   = document.createElement('div'); body.className = 'msg-body';
   const bubble = document.createElement('div'); bubble.className = 'bubble';
-
-  // Apply sentiment styling to bot bubbles
-  if (role === 'bot' && sentiment && sentiment !== 'neutral') {
-    bubble.classList.add(`sentiment-${sentiment}`);
-  }
-
   bubble.dataset.raw = text;
-  const time   = document.createElement('div'); time.className = 'msg-time'; time.textContent = timeStr || getTime();
-
-  body.appendChild(bubble); body.appendChild(time);
-  msg.appendChild(av); msg.appendChild(body);
-  chatWrap.appendChild(msg);
+  if (role === 'bot' && sentiment && sentiment !== 'neutral') bubble.classList.add(`sentiment-${sentiment}`);
+  const time = document.createElement('div'); time.className = 'msg-time'; time.textContent = timeStr || getTime();
+  body.appendChild(bubble); body.appendChild(time); msg.appendChild(av); msg.appendChild(body); chatWrap.appendChild(msg);
   requestAnimationFrame(() => { msg.style.opacity = '1'; });
 
   if (role === 'bot') {
-    // Build full content with sentiment badge + empathy note prepended
-    const badge = sentiment && sentiment !== 'neutral'
-      ? `<div class="sentiment-badge ${sentiment}">${sentiment === 'negative' ? '⚠️ Urgent' : '😊 Positive'}</div>`
-      : '';
-    const empathy = (sentiment === 'negative' && empathyNote)
-      ? `<div class="empathy-note">🤝 ${empathyNote}</div>`
-      : '';
+    const badge = sentiment === 'negative' ? `<div class="urgent-badge">⚠ Urgent</div>` : sentiment === 'positive' ? `<div class="positive-badge">😊 Positive</div>` : '';
+    const empathy = (sentiment === 'negative' && empathyNote) ? `<div class="empathy-note">🤝 ${empathyNote}</div>` : '';
     const fullHtml = badge + empathy + marked.parse(text);
-
-    if (silent) {
-      bubble.innerHTML = fullHtml;
-      addBotActions(body, text, lang);
-    } else {
-      let i = 0;
-      bubble.textContent = '';
-      const iv = setInterval(() => {
-        i++;
-        chatWrap.scrollTop = chatWrap.scrollHeight;
-        if (i >= text.length) {
-          clearInterval(iv);
-          bubble.innerHTML = fullHtml;
-          addBotActions(body, text, lang);
-          saveHistory();
-        }
-      }, 14);
+    if (silent) { bubble.innerHTML = fullHtml; addBotActions(body, text, lang); }
+    else {
+      let i = 0; bubble.textContent = '';
+      const iv = setInterval(() => { i++; chatWrap.scrollTop = chatWrap.scrollHeight; if (i >= text.length) { clearInterval(iv); bubble.innerHTML = fullHtml; addBotActions(body, text, lang); saveHistory(); } }, 12);
     }
-  } else {
-    bubble.textContent = text;
-    if (!silent) saveHistory();
-  }
+  } else { bubble.textContent = text; if (!silent) saveHistory(); }
   chatWrap.scrollTop = chatWrap.scrollHeight;
 }
 
 function addBotActions(body, text, ttsLang) {
   const actions = document.createElement('div'); actions.className = 'msg-actions';
-
-  // Copy button
   const copyBtn = document.createElement('button'); copyBtn.className = 'act-btn';
   copyBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
-  copyBtn.onclick = () => copyText(copyBtn, text);
+  copyBtn.onclick = () => { navigator.clipboard.writeText(text).then(() => { copyBtn.classList.add('copied'); copyBtn.innerHTML = `✓ ${t().copied}`; showToast(t().copied); setTimeout(() => { copyBtn.classList.remove('copied'); copyBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`; }, 2000); }); };
   actions.appendChild(copyBtn);
-
-  // NEW: Listen/TTS button
-  const ttsBtn = document.createElement('button'); ttsBtn.className = 'act-btn';
-  ttsBtn.innerHTML = speakerIcon() + ' Listen';
-  // Extract plain text for TTS (strip markdown)
-  const plainText = text.replace(/\*\*/g,'').replace(/\*/g,'').replace(/#+\s/g,'').replace(/- /g,'');
-  ttsBtn.onclick = () => speakText(plainText, ttsBtn, ttsLang);
-  actions.appendChild(ttsBtn);
-
-  // Thumbs
+  const ttsBtn = document.createElement('button'); ttsBtn.className = 'act-btn'; ttsBtn.innerHTML = speakerIcon() + ' Listen';
+  const plain = text.replace(/\*\*/g,'').replace(/\*/g,'').replace(/#+\s/g,'').replace(/- /g,'');
+  ttsBtn.onclick = () => speakText(plain, ttsBtn, ttsLang); actions.appendChild(ttsBtn);
   const goodBtn = document.createElement('button'); goodBtn.className = 'act-btn'; goodBtn.textContent = '👍';
-  goodBtn.onclick = () => giveFeedback(goodBtn, 'good'); actions.appendChild(goodBtn);
-  const badBtn  = document.createElement('button'); badBtn.className  = 'act-btn'; badBtn.textContent  = '👎';
-  badBtn.onclick  = () => giveFeedback(badBtn,  'bad');  actions.appendChild(badBtn);
-
-  body.appendChild(actions);
-
+  goodBtn.onclick = () => { goodBtn.style.color = '#4ade80'; goodBtn.disabled = true; };
+  const badBtn = document.createElement('button'); badBtn.className = 'act-btn'; badBtn.textContent = '👎';
+  badBtn.onclick = () => { badBtn.style.color = '#f87171'; badBtn.disabled = true; };
+  actions.appendChild(goodBtn); actions.appendChild(badBtn); body.appendChild(actions);
   const chips = getFollowups(text);
   if (chips.length) {
     const fu = document.createElement('div'); fu.className = 'followups';
-    chips.forEach(c => {
-      const btn = document.createElement('button'); btn.className = 'followup-chip'; btn.textContent = c;
-      btn.onclick = () => { userInput.value = c; sendMessage(); };
-      fu.appendChild(btn);
-    });
+    chips.forEach(c => { const btn = document.createElement('button'); btn.className = 'followup-chip'; btn.textContent = c; btn.onclick = () => { userInput.value = c; sendMessage(); }; fu.appendChild(btn); });
     body.appendChild(fu);
   }
 }
 
-function addErrorBubble(lastText) {
-  const welcome = document.getElementById('welcome'); if (welcome) welcome.remove();
-  const msg = document.createElement('div'); msg.className = 'message bot'; msg.style.opacity = '1';
-  const av  = document.createElement('div'); av.className = 'avatar'; av.innerHTML = ICONS.bot;
-  const body = document.createElement('div'); body.className = 'msg-body';
-  const errDiv = document.createElement('div'); errDiv.className = 'error-bubble';
-  errDiv.innerHTML = `⚠️ ${t().conn_error} <button class="retry-btn" onclick="retryMessage(this,'${encodeURIComponent(lastText)}')">${t().retry}</button>`;
-  body.appendChild(errDiv); msg.appendChild(av); msg.appendChild(body);
-  chatWrap.appendChild(msg); chatWrap.scrollTop = chatWrap.scrollHeight;
-}
-
-async function retryMessage(btn, enc) {
-  const text = decodeURIComponent(enc); btn.closest('.message').remove();
-  addMessage(text, 'user'); await callAPI(text);
-}
-
 function addTyping() {
-  const msg    = document.createElement('div'); msg.className = 'message bot typing'; msg.id = 'typing';
-  const av     = document.createElement('div'); av.className = 'avatar'; av.innerHTML = ICONS.bot;
+  const msg = document.createElement('div'); msg.className = 'message bot typing'; msg.id = 'typing';
+  const av = document.createElement('div'); av.className = 'avatar'; av.innerHTML = BOT_ICON;
   const bubble = document.createElement('div'); bubble.className = 'bubble';
   bubble.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
-  msg.appendChild(av); msg.appendChild(bubble);
-  chatWrap.appendChild(msg); requestAnimationFrame(() => { msg.style.opacity = '1'; });
-  chatWrap.scrollTop = chatWrap.scrollHeight;
+  msg.appendChild(av); msg.appendChild(bubble); chatWrap.appendChild(msg);
+  requestAnimationFrame(() => { msg.style.opacity = '1'; }); chatWrap.scrollTop = chatWrap.scrollHeight;
 }
-function removeTyping(){ const t = document.getElementById('typing'); if (t) t.remove(); }
+function removeTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
 
-// ── API call ─────────────────────────────────────────────────────────────────
+function renderWelcome() {
+  const w = document.createElement('div'); w.className = 'welcome'; w.id = 'welcome'; w.style.opacity = '1';
+  w.innerHTML = `<p style="font-size:13px;color:var(--text-muted);margin-bottom:6px;">${t().h1}</p><h1 class="welcome-heading">${t().h2}</h1><p class="welcome-sub">${t().sub}</p>`;
+  const row = document.createElement('div'); row.className = 'cards-row';
+  t().cards.forEach(svc => {
+    const card = document.createElement('div'); card.className = 'service-card';
+    card.innerHTML = `<div class="card-icon"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="#ff0080" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="18" height="13" rx="3"/><path d="M1 8h18"/><path d="M5 13h3M13 13h2"/></svg></div><div class="card-title">${svc.label}</div><div class="card-desc">${svc.desc}</div>`;
+    card.onclick = () => { userInput.value = svc.query; sendMessage(); }; row.appendChild(card);
+  });
+  w.appendChild(row);
+  const div = document.createElement('div'); div.className = 'divider'; w.appendChild(div);
+  const ql = document.createElement('div'); ql.className = 'quick-label'; ql.textContent = t().quick_label;
+  const qc = document.createElement('div'); qc.className = 'quick-chips';
+  t().quick.forEach(s => { const btn = document.createElement('button'); btn.className = 'quick-chip'; btn.textContent = s; btn.onclick = () => { userInput.value = s; sendMessage(); }; qc.appendChild(btn); });
+  w.appendChild(ql); w.appendChild(qc);
+  chatWrap.insertBefore(w, chatWrap.firstChild);
+}
+
+function clearChat() { chatWrap.innerHTML = ''; try { sessionStorage.removeItem(STORAGE_KEY); } catch(e) {} renderWelcome(); }
 
 async function callAPI(text) {
   addTyping();
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        question:   text,
-        session_id: sessionId,
-        lang:       langMode === 'manual' ? lang : null   // pass override only if manual
-      })
-    });
-    const data = await res.json();
-    removeTyping();
-
+    const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question: text, session_id: sessionId, lang: langMode === 'manual' ? lang : null }) });
+    const data = await res.json(); removeTyping();
     if (data.data && data.data.summary) {
       const r = data.data;
-      const responseLang = r.detected_lang || lang;
-      if (langMode === 'auto' && responseLang !== lang) {
-        applyLang(responseLang, 'auto');
-      }
-      const formatted = `**Summary:** ${r.summary}\n\n**Details:**\n${r.details.map(d=>'- '+d).join('\n')}\n\n**Next Steps:**\n${r.next_steps.map(s=>'- '+s).join('\n')}`;
+      if (langMode === 'auto' && r.detected_lang && r.detected_lang !== lang) applyLang(r.detected_lang, 'auto');
+      const formatted = `**Summary:** ${r.summary}\n\n**Details:**\n${r.details.map(d => '- ' + d).join('\n')}\n\n**Next Steps:**\n${r.next_steps.map(s => '- ' + s).join('\n')}`;
       addMessage(formatted, 'bot', null, false, r.sentiment, r.empathy_note);
-    } else {
-      addMessage(data.data?.error || 'Sorry, I could not get a response.', 'bot');
-    }
-  } catch(err) { removeTyping(); addErrorBubble(text); }
+    } else { addMessage(data.data?.error || 'Sorry, something went wrong.', 'bot'); }
+  } catch {
+    removeTyping();
+    const msg = document.createElement('div'); msg.className = 'message bot'; msg.style.opacity = '1';
+    const av = document.createElement('div'); av.className = 'avatar'; av.innerHTML = BOT_ICON;
+    const body = document.createElement('div'); body.className = 'msg-body';
+    const err = document.createElement('div'); err.className = 'error-bubble';
+    err.innerHTML = `⚠ ${t().conn_error} <button class="retry-btn" onclick="retryMessage(this,'${encodeURIComponent(text)}')">${t().retry}</button>`;
+    body.appendChild(err); msg.appendChild(av); msg.appendChild(body); chatWrap.appendChild(msg); chatWrap.scrollTop = chatWrap.scrollHeight;
+  }
   sendBtn.disabled = false; userInput.focus();
 }
 
-// ── Send message (with auto-detect) ─────────────────────────────────────────
+async function retryMessage(btn, enc) { const text = decodeURIComponent(enc); btn.closest('.message').remove(); addMessage(text, 'user'); await callAPI(text); }
 
 async function sendMessage() {
   const text = userInput.value.trim(); if (!text) return;
-  userInput.value = ''; userInput.style.height = 'auto';
-  hideAutocomplete(); sendBtn.disabled = true;
+  userInput.value = ''; userInput.style.height = 'auto'; hideAutocomplete(); sendBtn.disabled = true;
   addMessage(text, 'user');
-
-  // Auto-detect language from user input before calling API
-  if (langMode !== 'manual') {
-    await autoDetectLang(text);
-  }
-
+  if (langMode !== 'manual') await autoDetectLang(text);
   await callAPI(text);
 }
 
-// ── Copy ─────────────────────────────────────────────────────────────────────
-
-function copyText(btn, text) {
-  navigator.clipboard.writeText(text).then(() => {
-    btn.classList.add('copied');
-    btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${t().copied}`;
-    showToast(t().copied);
-    setTimeout(() => {
-      btn.classList.remove('copied');
-      btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
-    }, 2200);
-  }).catch(() => showToast('Copy failed'));
-}
-
-function giveFeedback(btn, type) {
-  btn.parentElement.querySelectorAll('.act-btn').forEach(b => b.disabled = true);
-  btn.classList.add(type === 'good' ? 'good' : 'bad');
-}
-
-// ── Autocomplete ─────────────────────────────────────────────────────────────
-
 const AC = {
-  en: ['How do I apply for a loan?','What is the savings account interest rate?','How to open a new account?','Fixed deposit interest rates','Credit card fees and charges','How to transfer money online?','What documents do I need?','How to reset my net banking PIN?','What is the minimum balance?','How to close my account?','Net banking setup guide','ATM daily withdrawal limit'],
-  hi: ['लोन के लिए कैसे आवेदन करें?','बचत खाते की ब्याज दर?','नया खाता कैसे खोलें?','फिक्स्ड डिपॉजिट दरें','क्रेडिट कार्ड शुल्क','ऑनलाइन पैसे ट्रांसफर?','कौन से दस्तावेज़ चाहिए?','नेट बैंकिंग पिन रीसेट?','न्यूनतम बैलेंस?','खाता बंद कैसे करें?']
+  en: ['How do I apply for a loan?','What is the savings account interest rate?','How to open a new account?','Fixed deposit interest rates','How to reset my net banking PIN?','What is the minimum balance?','ATM daily withdrawal limit'],
+  hi: ['लोन के लिए कैसे आवेदन करें?','बचत खाते की ब्याज दर?','नया खाता कैसे खोलें?','नेट बैंकिंग पिन रीसेट?','न्यूनतम बैलेंस?']
 };
 
 function showAutocomplete(q) {
   if (!q) { hideAutocomplete(); return; }
-  const list    = AC[lang] || AC.en;
-  const matches = list.filter(s => s.toLowerCase().includes(q.toLowerCase())).slice(0, 5);
+  const matches = (AC[lang] || AC.en).filter(s => s.toLowerCase().includes(q.toLowerCase())).slice(0, 4);
   if (!matches.length) { hideAutocomplete(); return; }
   autocompleteInner.innerHTML = '';
-  matches.forEach(m => {
-    const c = document.createElement('button'); c.className = 'ac-chip'; c.textContent = m;
-    c.onclick = () => { userInput.value = m; hideAutocomplete(); sendMessage(); };
-    autocompleteInner.appendChild(c);
-  });
+  matches.forEach(m => { const c = document.createElement('button'); c.className = 'ac-chip'; c.textContent = m; c.onclick = () => { userInput.value = m; hideAutocomplete(); sendMessage(); }; autocompleteInner.appendChild(c); });
   autocompleteEl.classList.add('visible');
 }
 function hideAutocomplete() { autocompleteEl.classList.remove('visible'); }
 
-userInput.addEventListener('input', () => {
-  userInput.style.height = 'auto';
-  userInput.style.height = Math.min(userInput.scrollHeight, 120) + 'px';
-  showAutocomplete(userInput.value.trim());
-});
-userInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-  if (e.key === 'Escape') hideAutocomplete();
-});
-
-// ── Welcome screen ───────────────────────────────────────────────────────────
-
-function renderWelcome() {
-  const w = document.createElement('div'); w.className = 'welcome'; w.id = 'welcome'; w.style.opacity = '1';
-
-  const header = document.createElement('div'); header.className = 'welcome-header';
-  const iconWrap = document.createElement('div'); iconWrap.className = 'welcome-icon-wrap';
-  iconWrap.innerHTML = `<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="3" y="8" width="22" height="15" rx="4" stroke="#2dd4bf" stroke-width="1.5"/>
-    <path d="M14 3v5" stroke="#2dd4bf" stroke-width="1.5" stroke-linecap="round"/>
-    <circle cx="14" cy="2.5" r="1.5" fill="#2dd4bf"/>
-    <path d="M3 12h22" stroke="#2dd4bf" stroke-width="1.2" opacity="0.5"/>
-    <rect x="8" y="16" width="4" height="4" rx="1.5" fill="#2dd4bf" opacity="0.7"/>
-    <rect x="16" y="16" width="4" height="4" rx="1.5" fill="#2dd4bf" opacity="0.4"/>
-  </svg>`;
-
-  const copy = document.createElement('div'); copy.className = 'welcome-copy';
-  copy.innerHTML = `<h2>${t().h2}</h2><p>${t().sub}</p>`;
-  header.appendChild(iconWrap); header.appendChild(copy);
-  w.appendChild(header);
-
-  const section = document.createElement('div'); section.className = 'services-section';
-  const pl = document.createElement('div'); pl.className = 'tier-label primary'; pl.textContent = t().primary_label;
-  section.appendChild(pl);
-
-  const primaryRow = document.createElement('div'); primaryRow.className = 'primary-row';
-  t().primary.forEach(svc => {
-    const card = document.createElement('div'); card.className = 'service-card-primary';
-    card.innerHTML = `
-      <div class="scp-badge">★ Featured</div>
-      <div class="scp-icon">${ICONS[svc.icon]}</div>
-      <div class="scp-label">${svc.label}</div>
-      <div class="scp-desc">${svc.desc}</div>
-      <div class="scp-arrow">${ARROW_SVG}</div>
-    `;
-    card.onclick = () => { userInput.value = svc.query; sendMessage(); };
-    primaryRow.appendChild(card);
-  });
-  section.appendChild(primaryRow);
-
-  const sl = document.createElement('div'); sl.className = 'tier-label secondary'; sl.textContent = t().secondary_label;
-  sl.style.marginTop = '14px';
-  section.appendChild(sl);
-
-  const secondaryRow = document.createElement('div'); secondaryRow.className = 'secondary-row';
-  t().secondary.forEach(svc => {
-    const card = document.createElement('div'); card.className = 'service-card-secondary';
-    card.innerHTML = `
-      <div class="scs-icon">${ICONS[svc.icon]}</div>
-      <div class="scs-text">
-        <div class="scs-label">${svc.label}</div>
-        <div class="scs-desc">${svc.desc}</div>
-      </div>
-    `;
-    card.onclick = () => { userInput.value = svc.query; sendMessage(); };
-    secondaryRow.appendChild(card);
-  });
-  section.appendChild(secondaryRow);
-  w.appendChild(section);
-
-  const div = document.createElement('div'); div.className = 'welcome-divider'; w.appendChild(div);
-  const ql  = document.createElement('div'); ql.className  = 'quick-label'; ql.textContent = t().quick_label; w.appendChild(ql);
-  const qc  = document.createElement('div'); qc.className  = 'quick-chips';
-  t().quick.forEach(s => {
-    const btn = document.createElement('button'); btn.className = 'quick-chip'; btn.textContent = s;
-    btn.onclick = () => { userInput.value = s; sendMessage(); };
-    qc.appendChild(btn);
-  });
-  w.appendChild(qc);
-  chatWrap.insertBefore(w, chatWrap.firstChild);
-}
-
-function clearChat() {
-  chatWrap.innerHTML = '';
-  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
-  renderWelcome();
-}
-
-// ── Voice input (STT) ────────────────────────────────────────────────────────
+userInput.addEventListener('input', () => { userInput.style.height = 'auto'; userInput.style.height = Math.min(userInput.scrollHeight, 120) + 'px'; showAutocomplete(userInput.value.trim()); });
+userInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } if (e.key === 'Escape') hideAutocomplete(); });
 
 let recognition = null, isListening = false;
-
 function toggleVoice() {
-  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-    addMessage('Voice input is not supported in this browser. Please use Chrome.', 'bot'); return;
-  }
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) { addMessage('Voice input is not supported in this browser. Please use Chrome.', 'bot'); return; }
   if (isListening) { recognition.stop(); return; }
-
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SR();
-  // Use current lang for voice recognition
-  recognition.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
-  recognition.interimResults = false;
+  recognition = new SR(); recognition.lang = lang === 'hi' ? 'hi-IN' : 'en-IN'; recognition.interimResults = false;
   recognition.onstart  = () => { isListening = true;  document.getElementById('micBtn').classList.add('listening'); userInput.placeholder = t().listening; };
-  recognition.onresult = (e) => { userInput.value = e.results[0][0].transcript; sendMessage(); };
+  recognition.onresult = e  => { userInput.value = e.results[0][0].transcript; sendMessage(); };
   recognition.onend    = () => { isListening = false; document.getElementById('micBtn').classList.remove('listening'); userInput.placeholder = t().placeholder; };
   recognition.onerror  = () => { isListening = false; document.getElementById('micBtn').classList.remove('listening'); userInput.placeholder = t().placeholder; };
   recognition.start();
 }
-
-// ── Init ──────────────────────────────────────────────────────────────────────
 
 applyLang(lang, langMode);
 const hasHistory = loadHistory();
