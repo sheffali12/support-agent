@@ -318,6 +318,33 @@ header {
 .message.bot .bubble p { margin-bottom: 8px; }
 .message.bot .bubble p:last-child { margin-bottom: 0; }
 .message.bot .bubble hr { border: none; border-top: 1px solid var(--border2); margin: 10px 0; }
+
+/* ── Sentiment styles ── */
+.message.bot .bubble.sentiment-negative {
+  border-left: 3px solid #f87171;
+  background: linear-gradient(135deg, #1a0a0a, #061a2d);
+}
+.message.bot .bubble.sentiment-positive {
+  border-left: 3px solid #4ade80;
+  background: linear-gradient(135deg, #071a0e, #061a2d);
+}
+.empathy-note {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: rgba(248,113,113,0.08);
+  border: 1px solid rgba(248,113,113,0.2);
+  border-radius: 8px; padding: 8px 12px;
+  font-size: 12.5px; color: #fca5a5;
+  margin-bottom: 10px; line-height: 1.5;
+}
+.sentiment-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 2px 8px;
+  border-radius: 100px; margin-bottom: 8px;
+}
+.sentiment-badge.negative { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
+.sentiment-badge.positive { background: rgba(74,222,128,0.10); color: #4ade80; border: 1px solid rgba(74,222,128,0.22); }
+.sentiment-badge.neutral  { display: none; }
 .msg-time { font-size: 10px; color: var(--text-muted); margin-top: 5px; padding: 0 3px; letter-spacing: 0.04em; }
 .msg-actions { display: flex; align-items: center; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
 .act-btn {
@@ -547,8 +574,8 @@ const STORAGE_KEY = 'nbs_pro_v2';
 // ── Language state ──────────────────────────────────────────────────────────
 // langMode: 'auto' | 'manual'
 // lang: 'en' | 'hi'  (current active language for UI)
-let langMode = sessionStorage.getItem('nbs_lang_mode') || 'auto';
-let lang     = sessionStorage.getItem('nbs_lang') || 'en';
+let langMode = localStorage.getItem('nbs_lang_mode') || 'auto';
+let lang     = localStorage.getItem('nbs_lang') || 'en';
 
 // Track current TTS audio so we can stop it
 let currentAudio = null;
@@ -629,8 +656,8 @@ function t() { return I18N[lang]; }
 function applyLang(newLang, mode) {
   lang     = newLang;
   langMode = mode;
-  sessionStorage.setItem('nbs_lang', lang);
-  sessionStorage.setItem('nbs_lang_mode', langMode);
+  localStorage.setItem('nbs_lang', lang);
+  localStorage.setItem('nbs_lang_mode', langMode);
 
   document.getElementById('btnEn').classList.toggle('active', lang === 'en');
   document.getElementById('btnHi').classList.toggle('active', lang === 'hi');
@@ -762,12 +789,12 @@ function saveHistory() {
     const time = m.querySelector('.msg-time')?.textContent || '';
     if (text) msgs.push({role,text,time});
   });
-  try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(msgs)); } catch(e){}
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(msgs)); } catch(e){}
 }
 
 function loadHistory() {
   try {
-    const saved = sessionStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(STORAGE_KEY);
     if (!saved) return false;
     const msgs = JSON.parse(saved);
     if (!msgs.length) return false;
@@ -788,7 +815,7 @@ function getFollowups(text) {
 
 // ── Message rendering ────────────────────────────────────────────────────────
 
-function addMessage(text, role, timeStr, silent) {
+function addMessage(text, role, timeStr, silent, sentiment, empathyNote) {
   const welcome = document.getElementById('welcome');
   if (welcome) welcome.remove();
 
@@ -797,6 +824,12 @@ function addMessage(text, role, timeStr, silent) {
   if (role === 'bot') av.innerHTML = ICONS.bot; else av.textContent = 'U';
   const body   = document.createElement('div'); body.className = 'msg-body';
   const bubble = document.createElement('div'); bubble.className = 'bubble';
+
+  // Apply sentiment styling to bot bubbles
+  if (role === 'bot' && sentiment && sentiment !== 'neutral') {
+    bubble.classList.add(`sentiment-${sentiment}`);
+  }
+
   bubble.dataset.raw = text;
   const time   = document.createElement('div'); time.className = 'msg-time'; time.textContent = timeStr || getTime();
 
@@ -806,8 +839,17 @@ function addMessage(text, role, timeStr, silent) {
   requestAnimationFrame(() => { msg.style.opacity = '1'; });
 
   if (role === 'bot') {
+    // Build full content with sentiment badge + empathy note prepended
+    const badge = sentiment && sentiment !== 'neutral'
+      ? `<div class="sentiment-badge ${sentiment}">${sentiment === 'negative' ? '⚠️ Urgent' : '😊 Positive'}</div>`
+      : '';
+    const empathy = (sentiment === 'negative' && empathyNote)
+      ? `<div class="empathy-note">🤝 ${empathyNote}</div>`
+      : '';
+    const fullHtml = badge + empathy + marked.parse(text);
+
     if (silent) {
-      bubble.innerHTML = marked.parse(text);
+      bubble.innerHTML = fullHtml;
       addBotActions(body, text, lang);
     } else {
       let i = 0;
@@ -817,7 +859,7 @@ function addMessage(text, role, timeStr, silent) {
         chatWrap.scrollTop = chatWrap.scrollHeight;
         if (i >= text.length) {
           clearInterval(iv);
-          bubble.innerHTML = marked.parse(text);
+          bubble.innerHTML = fullHtml;
           addBotActions(body, text, lang);
           saveHistory();
         }
@@ -913,13 +955,12 @@ async function callAPI(text) {
 
     if (data.data && data.data.summary) {
       const r = data.data;
-      // Use detected_lang from backend to drive TTS language
       const responseLang = r.detected_lang || lang;
       if (langMode === 'auto' && responseLang !== lang) {
         applyLang(responseLang, 'auto');
       }
       const formatted = `**Summary:** ${r.summary}\n\n**Details:**\n${r.details.map(d=>'- '+d).join('\n')}\n\n**Next Steps:**\n${r.next_steps.map(s=>'- '+s).join('\n')}`;
-      addMessage(formatted, 'bot');
+      addMessage(formatted, 'bot', null, false, r.sentiment, r.empathy_note);
     } else {
       addMessage(data.data?.error || 'Sorry, I could not get a response.', 'bot');
     }
@@ -1068,7 +1109,7 @@ function renderWelcome() {
 
 function clearChat() {
   chatWrap.innerHTML = '';
-  try { sessionStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
   renderWelcome();
 }
 

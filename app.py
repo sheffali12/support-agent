@@ -27,10 +27,12 @@ load_dotenv()
 # ── 1. RESPONSE SCHEMA ──────────────────────────────────────────────────────
 
 class StructuredResponse(BaseModel):
-    summary: str    = Field(description="A one-sentence summary of the answer.")
+    summary: str       = Field(description="A one-sentence summary of the answer.")
     details: List[str] = Field(description="2-5 detailed bullet points.")
     next_steps: List[str] = Field(description="Actionable next steps.")
     detected_lang: Optional[str] = Field(default="en", description="Detected language code: 'en' or 'hi'")
+    sentiment: Optional[str] = Field(default="neutral", description="Sentiment of user message: 'positive', 'negative', or 'neutral'")
+    empathy_note: Optional[str] = Field(default="", description="A short empathetic note shown only when sentiment is negative or frustrated.")
 
 # ── 2. LANGUAGE DETECTION ───────────────────────────────────────────────────
 
@@ -41,6 +43,45 @@ def detect_language(text: str) -> str:
         return "hi" if lang == "hi" else "en"
     except Exception:
         return "en"
+
+# ── 3. SENTIMENT DETECTION ──────────────────────────────────────────────────
+
+# Keyword-based fast sentiment check (no extra library needed)
+NEGATIVE_KEYWORDS_EN = [
+    "frustrated", "angry", "annoyed", "upset", "terrible", "horrible", "worst",
+    "useless", "pathetic", "hate", "disgusting", "unacceptable", "ridiculous",
+    "scam", "fraud", "cheating", "robbery", "stolen", "lost", "problem",
+    "issue", "complaint", "not working", "broken", "failed", "error",
+    "disappointed", "helpless", "stuck", "urgent", "immediately", "asap"
+]
+NEGATIVE_KEYWORDS_HI = [
+    "गुस्सा", "परेशान", "निराश", "बेकार", "खराब", "समस्या", "शिकायत",
+    "धोखा", "फ्रॉड", "चोरी", "तुरंत", "जरूरी", "नहीं हो रहा", "काम नहीं",
+    "बंद हो गया", "पैसे गए", "नुकसान"
+]
+POSITIVE_KEYWORDS_EN = [
+    "thank", "thanks", "great", "excellent", "wonderful", "perfect",
+    "helpful", "amazing", "love", "happy", "satisfied", "good", "nice"
+]
+POSITIVE_KEYWORDS_HI = [
+    "धन्यवाद", "शुक्रिया", "बढ़िया", "अच्छा", "खुश", "संतुष्ट", "मदद मिली"
+]
+
+def detect_sentiment(text: str) -> str:
+    """Returns 'positive', 'negative', or 'neutral'."""
+    lo = text.lower()
+    for kw in NEGATIVE_KEYWORDS_EN + NEGATIVE_KEYWORDS_HI:
+        if kw in lo:
+            return "negative"
+    for kw in POSITIVE_KEYWORDS_EN + POSITIVE_KEYWORDS_HI:
+        if kw in lo:
+            return "positive"
+    return "neutral"
+
+EMPATHY_MESSAGES = {
+    "en": "I understand this may be frustrating. I'm here to help and will do my best to resolve this for you.",
+    "hi": "मैं समझता हूँ कि यह परेशान करने वाला हो सकता है। मैं आपकी पूरी सहायता करने के लिए यहाँ हूँ।"
+}
 
 # ── 3. SUPPORT AGENT ────────────────────────────────────────────────────────
 
@@ -84,15 +125,20 @@ class SupportAgent:
             self.llm, retriever, contextualize_prompt
         )
 
-        # NEW: System prompt instructs LLM to respond in the same language as the user
+        # System prompt instructs LLM to respond in user's language + show empathy if negative
         qa_prompt = ChatPromptTemplate.from_messages([
             ("system", """You are a helpful banking support assistant for National Banking Services.
 
 LANGUAGE RULE (CRITICAL):
 - Detect the language of the user's question.
-- If the question is in Hindi (हिंदी), respond ENTIRELY in Hindi — all fields (summary, details, next_steps) must be in Hindi.
+- If the question is in Hindi (हिंदी), respond ENTIRELY in Hindi — all fields (summary, details, next_steps, empathy_note) must be in Hindi.
 - If the question is in English, respond entirely in English.
 - Never mix languages within a single response.
+
+SENTIMENT RULE:
+- If the user seems frustrated, angry, or upset, set sentiment to "negative" and write a short empathetic empathy_note.
+- If the user seems happy or thankful, set sentiment to "positive" and leave empathy_note empty.
+- Otherwise set sentiment to "neutral" and leave empathy_note empty.
 
 Use the retrieved context to answer accurately.
 You MUST follow the JSON format instructions strictly.
@@ -121,8 +167,8 @@ Context: {context}"""),
         return self.store[session_id]
 
     def ask(self, query: str, session_id: str = "default", lang_override: str = None):
-        # Detect language — use override if frontend explicitly set one
-        detected = lang_override if lang_override in ("en", "hi") else detect_language(query)
+        detected  = lang_override if lang_override in ("en", "hi") else detect_language(query)
+        sentiment = detect_sentiment(query)
         try:
             result = self.chain.invoke(
                 {"input": query},
@@ -130,11 +176,15 @@ Context: {context}"""),
             )
             parsed = self.parser.parse(result["answer"])
             data   = parsed.model_dump()
-            data["detected_lang"] = detected   # attach to response
+            data["detected_lang"] = detected
+            # If keyword sentiment says negative but LLM didn't catch it, ensure empathy
+            if sentiment == "negative" and not data.get("empathy_note"):
+                data["empathy_note"] = EMPATHY_MESSAGES.get(detected, EMPATHY_MESSAGES["en"])
+            data["sentiment"] = sentiment if sentiment != "neutral" else data.get("sentiment", "neutral")
             return data
         except Exception as e:
             print(f"Logic Error: {e}")
-            return {"error": "Failed to parse AI response. Please try again.", "detected_lang": detected}
+            return {"error": "Failed to parse AI response. Please try again.", "detected_lang": detected, "sentiment": "neutral"}
 
 # ── 4. FASTAPI APP ───────────────────────────────────────────────────────────
 
