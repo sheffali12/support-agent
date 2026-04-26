@@ -211,6 +211,7 @@ const langAutoDot = document.getElementById('langAutoDot');
 const API_URL    = 'https://support-agent-production-ce11.up.railway.app/chat';
 const TTS_URL    = 'https://support-agent-production-ce11.up.railway.app/tts';
 const DETECT_URL = 'https://support-agent-production-ce11.up.railway.app/detect-language';
+const EMI_URL    = 'https://support-agent-production-ce11.up.railway.app/calculate-emi';
 const sessionId  = 'user_' + Math.random().toString(36).slice(2, 9);
 const STORAGE_KEY = 'nbs_v3';
 
@@ -457,9 +458,189 @@ async function callAPI(text) {
 
 async function retryMessage(btn, enc) { const text = decodeURIComponent(enc); btn.closest('.message').remove(); addMessage(text, 'user'); await callAPI(text); }
 
+// ── EMI Detection & Calculator ────────────────────────────────────────────────
+
+const EMI_TRIGGERS_EN = ['emi', 'equated monthly', 'calculate loan', 'loan calculator', 'monthly instalment', 'monthly installment', 'how much will i pay', 'loan repayment', 'loan amount', 'home loan emi', 'car loan emi', 'personal loan emi'];
+const EMI_TRIGGERS_HI = ['emi', 'ईएमआई', 'मासिक किस्त', 'लोन कैलकुलेटर', 'लोन की किस्त', 'मासिक भुगतान'];
+
+function isEMIQuery(text) {
+  const lo = text.toLowerCase();
+  return [...EMI_TRIGGERS_EN, ...EMI_TRIGGERS_HI].some(t => lo.includes(t));
+}
+
+// Parse numbers from natural language — "10 lakh", "500000", "10,00,000"
+function parseAmount(text) {
+  const lo = text.toLowerCase().replace(/,/g, '');
+  const crore = lo.match(/(\d+\.?\d*)\s*crore/);  if (crore) return parseFloat(crore[1]) * 10000000;
+  const lakh  = lo.match(/(\d+\.?\d*)\s*lakh/);   if (lakh)  return parseFloat(lakh[1])  * 100000;
+  const k     = lo.match(/(\d+\.?\d*)\s*k\b/);    if (k)     return parseFloat(k[1])     * 1000;
+  const plain = lo.match(/(\d+\.?\d*)/);           if (plain) return parseFloat(plain[1]);
+  return null;
+}
+
+function extractEMIParams(text) {
+  const lo = text.toLowerCase();
+  // Try to extract principal, rate, tenure from natural language
+  const rateMatch    = lo.match(/(\d+\.?\d*)\s*%/);
+  const tenureMatch  = lo.match(/(\d+\.?\d*)\s*(year|yr|साल)/);
+  const monthMatch   = lo.match(/(\d+\.?\d*)\s*(month|महीने)/);
+
+  // Extract amount — look for lakh/crore/plain number before "loan" or at start
+  let principal = null;
+  const amtMatch = lo.match(/(\d[\d,.]*\s*(?:lakh|crore|k)?)\s*(?:loan|rupee|rs|₹)?/);
+  if (amtMatch) principal = parseAmount(amtMatch[1]);
+
+  return {
+    principal:    principal,
+    rate:         rateMatch    ? parseFloat(rateMatch[1])   : null,
+    tenure_years: tenureMatch  ? parseFloat(tenureMatch[1]) : (monthMatch ? parseFloat(monthMatch[1]) / 12 : null),
+  };
+}
+
+function formatINR(amount) {
+  return '₹' + Math.round(amount).toLocaleString('en-IN');
+}
+
+function addEMIWidget(principal, rate, tenure, data) {
+  const welcome = document.getElementById('welcome'); if (welcome) welcome.remove();
+
+  const msg  = document.createElement('div'); msg.className = 'message bot'; msg.style.opacity = '1';
+  const av   = document.createElement('div'); av.className  = 'avatar'; av.innerHTML = BOT_ICON;
+  const body = document.createElement('div'); body.className = 'msg-body'; body.style.maxWidth = '90%';
+
+  const widget = document.createElement('div');
+  widget.style.cssText = 'background:#111;border:1px solid rgba(255,0,128,0.22);border-radius:12px;padding:16px;min-width:280px;';
+
+  // Header
+  widget.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+      <div style="width:28px;height:28px;background:rgba(255,0,128,0.10);border:1px solid rgba(255,0,128,0.25);border-radius:7px;display:grid;place-items:center;">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#ff0080" stroke-width="1.5" stroke-linecap="round"><path d="M10 2v16M14 6H8a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6H6"/></svg>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#f0f0f0;">EMI Calculator</div>
+        <div style="font-size:10px;color:rgba(240,240,240,0.35);margin-top:1px;">Reducing balance method</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+      <div style="background:#1a1a1a;border-radius:8px;padding:10px;">
+        <div style="font-size:9px;color:rgba(240,240,240,0.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Monthly EMI</div>
+        <div style="font-size:16px;font-weight:600;color:#ff0080;">${formatINR(data.emi)}</div>
+      </div>
+      <div style="background:#1a1a1a;border-radius:8px;padding:10px;">
+        <div style="font-size:9px;color:rgba(240,240,240,0.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Total Interest</div>
+        <div style="font-size:16px;font-weight:600;color:#f87171;">${formatINR(data.total_interest)}</div>
+      </div>
+      <div style="background:#1a1a1a;border-radius:8px;padding:10px;">
+        <div style="font-size:9px;color:rgba(240,240,240,0.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Total Amount</div>
+        <div style="font-size:16px;font-weight:600;color:#f0f0f0;">${formatINR(data.total_amount)}</div>
+      </div>
+    </div>
+
+    <div style="background:#1a1a1a;border-radius:8px;padding:10px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px;">
+        <span style="color:rgba(240,240,240,0.45);">Principal</span>
+        <span style="color:#f0f0f0;font-weight:500;">${formatINR(data.principal)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px;">
+        <span style="color:rgba(240,240,240,0.45);">Interest Rate</span>
+        <span style="color:#f0f0f0;font-weight:500;">${data.annual_rate}% per annum</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:10px;">
+        <span style="color:rgba(240,240,240,0.45);">Tenure</span>
+        <span style="color:#f0f0f0;font-weight:500;">${data.tenure_years} years (${data.tenure_months} months)</span>
+      </div>
+      <div style="height:6px;background:#222;border-radius:100px;overflow:hidden;">
+        <div style="height:100%;border-radius:100px;background:linear-gradient(90deg,#ff0080,#f87171);width:${Math.round((data.total_interest/data.total_amount)*100)}%;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(240,240,240,0.3);margin-top:4px;">
+        <span>Principal ${Math.round((data.principal/data.total_amount)*100)}%</span>
+        <span>Interest ${Math.round((data.total_interest/data.total_amount)*100)}%</span>
+      </div>
+    </div>
+
+    <div style="font-size:9px;color:rgba(240,240,240,0.22);line-height:1.5;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">
+      ⚠ ${data.disclaimer}
+    </div>
+  `;
+
+  // Interactive recalculate inputs
+  const form = document.createElement('div');
+  form.style.cssText = 'margin-top:12px;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;';
+  form.innerHTML = `
+    <div style="font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(240,240,240,0.3);margin-bottom:10px;">Recalculate</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px;">
+      <div>
+        <div style="font-size:9px;color:rgba(240,240,240,0.35);margin-bottom:4px;">Amount (₹)</div>
+        <input id="emi-p" type="number" value="${Math.round(principal)}" style="width:100%;background:#1a1a1a;border:1px solid rgba(255,255,255,0.10);border-radius:6px;padding:6px 8px;font-size:12px;color:#f0f0f0;outline:none;font-family:inherit;"/>
+      </div>
+      <div>
+        <div style="font-size:9px;color:rgba(240,240,240,0.35);margin-bottom:4px;">Rate (%)</div>
+        <input id="emi-r" type="number" step="0.1" value="${rate}" style="width:100%;background:#1a1a1a;border:1px solid rgba(255,255,255,0.10);border-radius:6px;padding:6px 8px;font-size:12px;color:#f0f0f0;outline:none;font-family:inherit;"/>
+      </div>
+      <div>
+        <div style="font-size:9px;color:rgba(240,240,240,0.35);margin-bottom:4px;">Years</div>
+        <input id="emi-t" type="number" step="0.5" value="${tenure}" style="width:100%;background:#1a1a1a;border:1px solid rgba(255,255,255,0.10);border-radius:6px;padding:6px 8px;font-size:12px;color:#f0f0f0;outline:none;font-family:inherit;"/>
+      </div>
+    </div>
+    <button id="emi-calc-btn" style="width:100%;background:#ff0080;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;">Calculate</button>
+    <div id="emi-result" style="margin-top:10px;font-size:13px;font-weight:600;color:#ff0080;text-align:center;display:none;"></div>
+  `;
+  widget.appendChild(form);
+
+  const time = document.createElement('div'); time.className = 'msg-time'; time.textContent = getTime();
+  body.appendChild(widget); body.appendChild(time);
+  msg.appendChild(av); msg.appendChild(body);
+  chatWrap.appendChild(msg); chatWrap.scrollTop = chatWrap.scrollHeight;
+
+  // Recalculate button handler
+  document.getElementById('emi-calc-btn').onclick = async () => {
+    const btn = document.getElementById('emi-calc-btn');
+    const p = parseFloat(document.getElementById('emi-p').value);
+    const r = parseFloat(document.getElementById('emi-r').value);
+    const t = parseFloat(document.getElementById('emi-t').value);
+    if (!p || !r || !t) { return; }
+    btn.textContent = 'Calculating…'; btn.disabled = true;
+    try {
+      const res  = await fetch(EMI_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ principal: p, annual_rate: r, tenure_years: t }) });
+      const data = await res.json();
+      const result = document.getElementById('emi-result');
+      result.style.display = 'block';
+      result.innerHTML = `Monthly EMI: <span style="color:#ff0080;">${formatINR(data.emi)}</span> &nbsp;|&nbsp; Total Interest: <span style="color:#f87171;">${formatINR(data.total_interest)}</span>`;
+    } catch { }
+    btn.textContent = 'Calculate'; btn.disabled = false;
+  };
+}
+
+async function handleEMIQuery(text) {
+  // Try to extract params from the message
+  const params = extractEMIParams(text);
+  const p = params.principal || 500000;
+  const r = params.rate       || 8.5;
+  const t = params.tenure_years || 5;
+
+  addMessage(text, 'user');
+  addTyping();
+  try {
+    const res  = await fetch(EMI_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ principal: p, annual_rate: r, tenure_years: t }) });
+    const data = await res.json();
+    removeTyping();
+    addEMIWidget(p, r, t, data);
+  } catch {
+    removeTyping();
+    await callAPI(text); // fallback to normal chat
+  }
+  sendBtn.disabled = false; userInput.focus();
+}
+
 async function sendMessage() {
   const text = userInput.value.trim(); if (!text) return;
   userInput.value = ''; userInput.style.height = 'auto'; hideAutocomplete(); sendBtn.disabled = true;
+  if (isEMIQuery(text)) {
+    await handleEMIQuery(text);
+    return;
+  }
   addMessage(text, 'user');
   if (langMode !== 'manual') await autoDetectLang(text);
   await callAPI(text);

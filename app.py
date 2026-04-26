@@ -17,14 +17,14 @@ from langchain_core.output_parsers import PydanticOutputParser
 from langchain_classic.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from contextlib import asynccontextmanager
-from gtts import gTTS                          # NEW: text-to-speech
-from langdetect import detect                  # NEW: language detection
+from gtts import gTTS                          # text-to-speech
+from langdetect import detect                  # language detection
 import io
 import uvicorn
 
 load_dotenv()
 
-# ── 1. RESPONSE SCHEMA ──────────────────────────────────────────────────────
+# ── 1. RESPONSE SCHEMA 
 
 class StructuredResponse(BaseModel):
     summary: str       = Field(description="A one-sentence summary of the answer.")
@@ -34,7 +34,7 @@ class StructuredResponse(BaseModel):
     sentiment: Optional[str] = Field(default="neutral", description="Sentiment of user message: 'positive', 'negative', or 'neutral'")
     empathy_note: Optional[str] = Field(default="", description="A short empathetic note shown only when sentiment is negative or frustrated.")
 
-# ── 2. LANGUAGE DETECTION ───────────────────────────────────────────────────
+# ── 2. LANGUAGE DETECTION 
 
 def detect_language(text: str) -> str:
     """Detect if input is Hindi ('hi') or English ('en')."""
@@ -44,7 +44,7 @@ def detect_language(text: str) -> str:
     except Exception:
         return "en"
 
-# ── 3. SENTIMENT DETECTION ──────────────────────────────────────────────────
+# ── 3. SENTIMENT DETECTION
 
 # Keyword-based fast sentiment check (no extra library needed)
 NEGATIVE_KEYWORDS_EN = [
@@ -83,7 +83,7 @@ EMPATHY_MESSAGES = {
     "hi": "मैं समझता हूँ कि यह परेशान करने वाला हो सकता है। मैं आपकी पूरी सहायता करने के लिए यहाँ हूँ।"
 }
 
-# ── 3. SUPPORT AGENT ────────────────────────────────────────────────────────
+# ── 3. SUPPORT AGENT 
 
 class SupportAgent:
 
@@ -186,7 +186,7 @@ Context: {context}"""),
             print(f"Logic Error: {e}")
             return {"error": "Failed to parse AI response. Please try again.", "detected_lang": detected, "sentiment": "neutral"}
 
-# ── 4. FASTAPI APP ───────────────────────────────────────────────────────────
+# ── 4. FASTAPI APP 
 
 agent = None
 
@@ -206,7 +206,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── 5. REQUEST MODELS ────────────────────────────────────────────────────────
+# ── 5. REQUEST MODELS 
 
 class ChatRequest(BaseModel):
     question:   str
@@ -217,7 +217,7 @@ class TTSRequest(BaseModel):
     text: str
     lang: str = "en"                   # "en" or "hi"
 
-# ── 6. ENDPOINTS ─────────────────────────────────────────────────────────────
+# ── 6. ENDPOINTS
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
@@ -261,6 +261,64 @@ async def text_to_speech(request: TTSRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"TTS error: {str(e)}")
+
+
+# ── 7. EMI CALCULATOR 
+
+class EMIRequest(BaseModel):
+    principal:     float = Field(description="Loan amount in rupees")
+    annual_rate:   float = Field(description="Annual interest rate in percent (e.g. 8.5)")
+    tenure_years:  float = Field(description="Loan tenure in years (e.g. 5)")
+
+@app.post("/calculate-emi")
+async def calculate_emi(request: EMIRequest):
+    """
+    EMI Calculator — reducing balance method.
+    Returns monthly EMI, total interest, total amount, and a yearly breakdown.
+    """
+    if request.principal <= 0 or request.annual_rate <= 0 or request.tenure_years <= 0:
+        raise HTTPException(status_code=400, detail="All values must be positive")
+
+    P = request.principal
+    r = request.annual_rate / 12 / 100        
+    n = int(request.tenure_years * 12)        
+
+    # Standard EMI formula (reducing balance)
+    emi = P * r * (1 + r) ** n / ((1 + r) ** n - 1)
+    total_amount   = emi * n
+    total_interest = total_amount - P
+
+    # Year-by-year breakdown
+    breakdown = []
+    balance = P
+    for year in range(1, int(request.tenure_years) + 1):
+        year_principal = 0
+        year_interest  = 0
+        months = min(12, n - (year - 1) * 12)
+        for _ in range(months):
+            interest   = balance * r
+            principal  = emi - interest
+            balance   -= principal
+            year_principal += principal
+            year_interest  += interest
+        breakdown.append({
+            "year":           year,
+            "principal_paid": round(year_principal, 2),
+            "interest_paid":  round(year_interest,  2),
+            "balance":        round(max(balance, 0), 2)
+        })
+
+    return {
+        "emi":            round(emi, 2),
+        "total_amount":   round(total_amount, 2),
+        "total_interest": round(total_interest, 2),
+        "principal":      round(P, 2),
+        "annual_rate":    request.annual_rate,
+        "tenure_years":   request.tenure_years,
+        "tenure_months":  n,
+        "breakdown":      breakdown,
+        "disclaimer":     "For illustration purposes only. Actual EMI may vary based on bank policies."
+    }
 
 
 if __name__ == "__main__":
