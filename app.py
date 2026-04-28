@@ -211,8 +211,8 @@ app.add_middleware(
 class ChatRequest(BaseModel):
     question:   str
     session_id: str = "default"
-    lang:       Optional[str] = None   # NEW: optional manual override ("en" | "hi")
-
+    lang:       Optional[str] = None 
+    
 class TTSRequest(BaseModel):
     text: str
     lang: str = "en"                   # "en" or "hi"

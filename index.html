@@ -441,7 +441,9 @@ async function callAPI(text) {
     if (data.data && data.data.summary) {
       const r = data.data;
       if (langMode === 'auto' && r.detected_lang && r.detected_lang !== lang) applyLang(r.detected_lang, 'auto');
-      const formatted = `**Summary:** ${r.summary}\n\n**Details:**\n${r.details.map(d => '- ' + d).join('\n')}\n\n**Next Steps:**\n${r.next_steps.map(s => '- ' + s).join('\n')}`;
+      const details   = r.details   && r.details.length   ? `\n\n**Details:**\n${r.details.map(d => '- ' + d).join('\n')}` : '';
+      const nextSteps = r.next_steps && r.next_steps.length ? `\n\n**Next Steps:**\n${r.next_steps.map(s => '- ' + s).join('\n')}` : '';
+      const formatted = `${r.summary}${details}${nextSteps}`;
       addMessage(formatted, 'bot', null, false, r.sentiment, r.empathy_note);
     } else { addMessage(data.data?.error || 'Sorry, something went wrong.', 'bot'); }
   } catch {
