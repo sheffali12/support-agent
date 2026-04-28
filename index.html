@@ -230,7 +230,7 @@ const I18N = {
       { label: 'Loans & Credit',  desc: 'Apply, eligibility & EMI',      query: 'How do I apply for a loan and what are the requirements?' },
     ],
     quick_label: 'Quick questions',
-    quick: ['Minimum balance?', 'Reset my PIN'],
+    quick: ['Minimum balance?', 'Reset my PIN', 'Fixed deposit rates?', 'Net banking setup'],
     followups: {
       savings: ['Min balance?', 'How to open?', 'Interest taxable?'],
       loan:    ['Documents needed?', 'Interest rate?', 'Approval time?'],
@@ -249,7 +249,7 @@ const I18N = {
       { label: 'लोन और क्रेडिट', desc: 'आवेदन, पात्रता और EMI',                 query: 'लोन के लिए कैसे आवेदन करें?' },
     ],
     quick_label: 'जल्दी पूछें',
-    quick: ['न्यूनतम बैलेंस?', 'पिन रीसेट'],
+    quick: ['न्यूनतम बैलेंस?', 'पिन रीसेट', 'फिक्स्ड डिपॉजिट दरें?', 'नेट बैंकिंग सेटअप'],
     followups: {
       savings: ['न्यूनतम बैलेंस?', 'खाता कैसे खोलें?', 'ब्याज पर टैक्स?'],
       loan:    ['दस्तावेज़?', 'ब्याज दर?', 'अनुमोदन समय?'],
@@ -441,9 +441,7 @@ async function callAPI(text) {
     if (data.data && data.data.summary) {
       const r = data.data;
       if (langMode === 'auto' && r.detected_lang && r.detected_lang !== lang) applyLang(r.detected_lang, 'auto');
-      const details   = r.details   && r.details.length   ? `\n\n**Details:**\n${r.details.map(d => '- ' + d).join('\n')}` : '';
-      const nextSteps = r.next_steps && r.next_steps.length ? `\n\n**Next Steps:**\n${r.next_steps.map(s => '- ' + s).join('\n')}` : '';
-      const formatted = `${r.summary}${details}${nextSteps}`;
+      const formatted = `**Summary:** ${r.summary}\n\n**Details:**\n${r.details.map(d => '- ' + d).join('\n')}\n\n**Next Steps:**\n${r.next_steps.map(s => '- ' + s).join('\n')}`;
       addMessage(formatted, 'bot', null, false, r.sentiment, r.empathy_note);
     } else { addMessage(data.data?.error || 'Sorry, something went wrong.', 'bot'); }
   } catch {
