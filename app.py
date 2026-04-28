@@ -17,14 +17,14 @@ from langchain_core.output_parsers import PydanticOutputParser
 from langchain_classic.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from contextlib import asynccontextmanager
-from gtts import gTTS                          # text-to-speech
-from langdetect import detect                  # language detection
+from gtts import gTTS                           # text-to-speech
+from langdetect import detect                  #  language detection
 import io
 import uvicorn
 
 load_dotenv()
 
-# ── 1. RESPONSE SCHEMA 
+# ── 1. RESPONSE SCHEMA ──────────────────────────────────────────────────────
 
 class StructuredResponse(BaseModel):
     summary: str       = Field(description="A one-sentence summary of the answer.")
@@ -34,7 +34,7 @@ class StructuredResponse(BaseModel):
     sentiment: Optional[str] = Field(default="neutral", description="Sentiment of user message: 'positive', 'negative', or 'neutral'")
     empathy_note: Optional[str] = Field(default="", description="A short empathetic note shown only when sentiment is negative or frustrated.")
 
-# ── 2. LANGUAGE DETECTION 
+# ── 2. LANGUAGE DETECTION ───────────────────────────────────────────────────
 
 def detect_language(text: str) -> str:
     """Detect if input is Hindi ('hi') or English ('en')."""
@@ -44,7 +44,7 @@ def detect_language(text: str) -> str:
     except Exception:
         return "en"
 
-# ── 3. SENTIMENT DETECTION
+# ── 3. SENTIMENT DETECTION ──────────────────────────────────────────────────
 
 # Keyword-based fast sentiment check (no extra library needed)
 NEGATIVE_KEYWORDS_EN = [
@@ -83,7 +83,7 @@ EMPATHY_MESSAGES = {
     "hi": "मैं समझता हूँ कि यह परेशान करने वाला हो सकता है। मैं आपकी पूरी सहायता करने के लिए यहाँ हूँ।"
 }
 
-# ── 3. SUPPORT AGENT 
+# ── 3. SUPPORT AGENT ────────────────────────────────────────────────────────
 
 class SupportAgent:
 
@@ -130,10 +130,11 @@ class SupportAgent:
             ("system", """You are a helpful banking support assistant for National Banking Services.
 
 LANGUAGE RULE (CRITICAL):
-- Detect the language of the user's question.
-- If the question is in Hindi (हिंदी), respond ENTIRELY in Hindi — all fields (summary, details, next_steps, empathy_note) must be in Hindi.
-- If the question is in English, respond entirely in English.
+- You will be told the detected language explicitly in the user message as [LANG:en] or [LANG:hi].
+- If [LANG:en] → respond ENTIRELY in English. No Hindi words at all.
+- If [LANG:hi] → respond ENTIRELY in Hindi. No English words at all.
 - Never mix languages within a single response.
+- Default to English if unsure.
 
 SENTIMENT RULE:
 - If the user seems frustrated, angry, or upset, set sentiment to "negative" and write a short empathetic empathy_note.
@@ -169,15 +170,16 @@ Context: {context}"""),
     def ask(self, query: str, session_id: str = "default", lang_override: str = None):
         detected  = lang_override if lang_override in ("en", "hi") else detect_language(query)
         sentiment = detect_sentiment(query)
+        # Explicitly tag language so LLM never guesses wrong
+        tagged_query = f"[LANG:{detected}] {query}"
         try:
             result = self.chain.invoke(
-                {"input": query},
+                {"input": tagged_query},
                 config={"configurable": {"session_id": session_id}}
             )
             parsed = self.parser.parse(result["answer"])
             data   = parsed.model_dump()
             data["detected_lang"] = detected
-            # If keyword sentiment says negative but LLM didn't catch it, ensure empathy
             if sentiment == "negative" and not data.get("empathy_note"):
                 data["empathy_note"] = EMPATHY_MESSAGES.get(detected, EMPATHY_MESSAGES["en"])
             data["sentiment"] = sentiment if sentiment != "neutral" else data.get("sentiment", "neutral")
@@ -186,7 +188,7 @@ Context: {context}"""),
             print(f"Logic Error: {e}")
             return {"error": "Failed to parse AI response. Please try again.", "detected_lang": detected, "sentiment": "neutral"}
 
-# ── 4. FASTAPI APP 
+# ── 4. FASTAPI APP ───────────────────────────────────────────────────────────
 
 agent = None
 
@@ -206,18 +208,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── 5. REQUEST MODELS 
+# ── 5. REQUEST MODELS ────────────────────────────────────────────────────────
 
 class ChatRequest(BaseModel):
     question:   str
     session_id: str = "default"
-    lang:       Optional[str] = None 
-    
+    lang:       Optional[str] = None   # NEW: optional manual override ("en" | "hi")
+
 class TTSRequest(BaseModel):
     text: str
     lang: str = "en"                   # "en" or "hi"
 
-# ── 6. ENDPOINTS
+# ── 6. ENDPOINTS ─────────────────────────────────────────────────────────────
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
@@ -263,7 +265,7 @@ async def text_to_speech(request: TTSRequest):
         raise HTTPException(status_code=500, detail=f"TTS error: {str(e)}")
 
 
-# ── 7. EMI CALCULATOR 
+# ── 7. EMI CALCULATOR ENDPOINT ───────────────────────────────────────────────
 
 class EMIRequest(BaseModel):
     principal:     float = Field(description="Loan amount in rupees")
@@ -280,8 +282,8 @@ async def calculate_emi(request: EMIRequest):
         raise HTTPException(status_code=400, detail="All values must be positive")
 
     P = request.principal
-    r = request.annual_rate / 12 / 100        
-    n = int(request.tenure_years * 12)        
+    r = request.annual_rate / 12 / 100        # monthly interest rate
+    n = int(request.tenure_years * 12)        # total months
 
     # Standard EMI formula (reducing balance)
     emi = P * r * (1 + r) ** n / ((1 + r) ** n - 1)
