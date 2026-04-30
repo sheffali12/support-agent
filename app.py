@@ -17,12 +17,12 @@ from langchain_core.output_parsers import PydanticOutputParser
 from langchain_classic.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from contextlib import asynccontextmanager
-from gtts import gTTS                           # text-to-speech
+from gtts import gTTS                          # TTS
 from langdetect import detect                  #  language detection
 import io
 import uvicorn
 
-load_dotenv()
+load_dotenv() 
 
 # ── 1. RESPONSE SCHEMA ──────────────────────────────────────────────────────
 
@@ -265,7 +265,7 @@ async def text_to_speech(request: TTSRequest):
         raise HTTPException(status_code=500, detail=f"TTS error: {str(e)}")
 
 
-# ── 7. EMI CALCULATOR ENDPOINT ───────────────────────────────────────────────
+# ── 7. EMI CALCULATOR ENDPOINT 
 
 class EMIRequest(BaseModel):
     principal:     float = Field(description="Loan amount in rupees")

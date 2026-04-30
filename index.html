@@ -71,7 +71,32 @@ header { flex-shrink: 0; height: 58px; padding: 0 20px; display: flex; align-ite
 .quick-chip { padding: 7px 14px; border-radius: 100px; border: 1px solid var(--border2); background: var(--bg2); font-size: 12px; color: var(--text-dim); cursor: pointer; font-family: var(--font); transition: all 0.15s; }
 .quick-chip:hover { border-color: var(--pink-border); color: var(--pink); background: var(--pink-dim); }
 
-/* Messages */
+/* ── Summary card ── */
+.summary-card {
+  flex-shrink: 0;
+  margin: 10px 20px 0;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: none;
+  gap: 0;
+  animation: fadeUp 0.3s ease both;
+}
+.summary-card.visible { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.summary-card-title {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--pink); margin-right: 4px; flex-shrink: 0;
+}
+.summary-stat {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 6px; padding: 4px 10px;
+  font-size: 11px; color: var(--text-dim);
+}
+.summary-stat span { color: var(--text); font-weight: 500; }
+.summary-divider { width: 1px; height: 16px; background: var(--border2); flex-shrink: 0; }
 .message { display: flex; gap: 10px; animation: fadeUp 0.25s ease both; opacity: 0; }
 .message.user { flex-direction: row-reverse; }
 .avatar { width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0; display: grid; place-items: center; margin-top: 2px; }
@@ -160,6 +185,12 @@ header { flex-shrink: 0; height: 58px; padding: 0 20px; display: flex; align-ite
         <div class="lang-auto-dot" id="langAutoDot"></div>
       </div>
       <div class="online-badge"><div class="online-dot"></div>Online</div>
+      <button class="clear-btn" onclick="exportChat()" title="Download conversation">
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 2v10M5 8l4 4 4-4"/>
+          <path d="M2 14h14"/>
+        </svg>
+      </button>
       <button class="clear-btn" onclick="clearChat()" title="Clear chat">
         <svg width="14" height="14" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="3 6 4.5 16.5 13.5 16.5 15 6"/>
@@ -169,6 +200,18 @@ header { flex-shrink: 0; height: 58px; padding: 0 20px; display: flex; align-ite
       </button>
     </div>
   </header>
+
+  <!-- Summary card -->
+  <div class="summary-card" id="summaryCard">
+    <div class="summary-card-title">📊 Session</div>
+    <div class="summary-stat">Questions <span id="sc-count">0</span></div>
+    <div class="summary-divider"></div>
+    <div class="summary-stat">Topics <span id="sc-topics">—</span></div>
+    <div class="summary-divider"></div>
+    <div class="summary-stat">Mood <span id="sc-mood">😊 Positive</span></div>
+    <div class="summary-divider"></div>
+    <div class="summary-stat">Lang <span id="sc-lang">EN</span></div>
+  </div>
 
   <div class="chat-wrap" id="chatWrap"></div>
 
@@ -431,7 +474,72 @@ function renderWelcome() {
   chatWrap.insertBefore(w, chatWrap.firstChild);
 }
 
-function clearChat() { chatWrap.innerHTML = ''; try { sessionStorage.removeItem(STORAGE_KEY); } catch(e) {} renderWelcome(); }
+function exportChat() {
+  const messages = chatWrap.querySelectorAll('.message');
+  if (!messages.length) { showToast('No conversation to export'); return; }
+
+  const date = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
+  const time = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+  let content = '';
+  content += '═══════════════════════════════════════════════════\n';
+  content += '       NBS — National Banking Services\n';
+  content += '       Support Assistant — Conversation Export\n';
+  content += '═══════════════════════════════════════════════════\n';
+  content += `Date     : ${date}\n`;
+  content += `Time     : ${time}\n`;
+  content += `Session  : ${sessionId}\n`;
+  content += '═══════════════════════════════════════════════════\n\n';
+
+  messages.forEach(msg => {
+    const isUser = msg.classList.contains('user');
+    const bubble = msg.querySelector('.bubble');
+    const time   = msg.querySelector('.msg-time')?.textContent || '';
+    const raw    = bubble?.dataset.raw || bubble?.textContent || '';
+    if (!raw.trim()) return;
+
+    if (isUser) {
+      content += `[${time}] You:\n${raw.trim()}\n\n`;
+    } else {
+      // Clean markdown for plain text export
+      const clean = raw
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\*(.*?)\*/g, '$1')
+        .replace(/^#+\s/gm, '')
+        .trim();
+      content += `[${time}] NBS Assistant:\n${clean}\n\n`;
+    }
+    content += '───────────────────────────────────────────────────\n\n';
+  });
+
+  content += '═══════════════════════════════════════════════════\n';
+  content += 'Disclaimer: This conversation is for reference only.\n';
+  content += 'For official banking queries, contact NBS directly.\n';
+  content += '═══════════════════════════════════════════════════\n';
+
+  // Download as .txt file
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `NBS_Conversation_${date.replace(/ /g,'_')}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Conversation downloaded!');
+}
+
+function clearChat() {
+  chatWrap.innerHTML = '';
+  try { sessionStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  // Reset summary card
+  summaryState.count = 0;
+  summaryState.topics.clear();
+  summaryState.sentiments.length = 0;
+  summaryState.langs.clear();
+  summaryState.langs.add('en');
+  document.getElementById('summaryCard').classList.remove('visible');
+  renderWelcome();
+}
 
 async function callAPI(text) {
   addTyping();
@@ -443,6 +551,7 @@ async function callAPI(text) {
       if (langMode === 'auto' && r.detected_lang && r.detected_lang !== lang) applyLang(r.detected_lang, 'auto');
       const formatted = `**Summary:** ${r.summary}\n\n**Details:**\n${r.details.map(d => '- ' + d).join('\n')}\n\n**Next Steps:**\n${r.next_steps.map(s => '- ' + s).join('\n')}`;
       addMessage(formatted, 'bot', null, false, r.sentiment, r.empathy_note);
+      updateSummaryCard(text, r.sentiment, r.detected_lang);
     } else { addMessage(data.data?.error || 'Sorry, something went wrong.', 'bot'); }
   } catch {
     removeTyping();
@@ -458,7 +567,62 @@ async function callAPI(text) {
 
 async function retryMessage(btn, enc) { const text = decodeURIComponent(enc); btn.closest('.message').remove(); addMessage(text, 'user'); await callAPI(text); }
 
-// ── EMI Detection & Calculator ────────────────────────────────────────────────
+// ── Summary card tracking ─────────────────────────────────────────────────────
+
+const summaryState = {
+  count: 0,
+  topics: new Set(),
+  sentiments: [],
+  langs: new Set(['en']),
+};
+
+const TOPIC_MAP = {
+  savings:  ['saving', 'बचत', 'interest rate', 'account'],
+  loan:     ['loan', 'लोन', 'borrow', 'credit'],
+  emi:      ['emi', 'instalment', 'installment', 'किस्त'],
+  deposit:  ['deposit', 'fixed', 'डिपॉजिट', 'fd'],
+  transfer: ['transfer', 'send money', 'ट्रांसफर', 'upi'],
+  pin:      ['pin', 'password', 'reset', 'पिन'],
+  balance:  ['balance', 'minimum', 'बैलेंस'],
+};
+
+function getTopicFromText(text) {
+  const lo = text.toLowerCase();
+  for (const [topic, keywords] of Object.entries(TOPIC_MAP)) {
+    if (keywords.some(k => lo.includes(k))) return topic;
+  }
+  return null;
+}
+
+function getMoodEmoji(sentiments) {
+  if (!sentiments.length) return '😊 Positive';
+  const counts = { positive: 0, negative: 0, neutral: 0 };
+  sentiments.forEach(s => counts[s]++);
+  if (counts.negative > counts.positive) return '😟 Needs help';
+  if (counts.positive > 0) return '😊 Positive';
+  return '😐 Neutral';
+}
+
+function updateSummaryCard(userText, sentiment, responseLang) {
+  summaryState.count++;
+  const topic = getTopicFromText(userText);
+  if (topic) summaryState.topics.add(topic);
+  if (sentiment) summaryState.sentiments.push(sentiment);
+  if (responseLang) summaryState.langs.add(responseLang.toUpperCase());
+
+  // Show the card
+  const card = document.getElementById('summaryCard');
+  card.classList.add('visible');
+
+  // Update stats
+  document.getElementById('sc-count').textContent = summaryState.count;
+  const topicsArr = [...summaryState.topics];
+  document.getElementById('sc-topics').textContent = topicsArr.length
+    ? topicsArr.slice(0, 3).map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(' · ')
+    : '—';
+  document.getElementById('sc-mood').textContent = getMoodEmoji(summaryState.sentiments);
+  document.getElementById('sc-lang').textContent = [...summaryState.langs].join(' · ');
+}
 
 const EMI_TRIGGERS_EN = ['emi', 'equated monthly', 'calculate loan', 'loan calculator', 'monthly instalment', 'monthly installment', 'how much will i pay', 'loan repayment', 'loan amount', 'home loan emi', 'car loan emi', 'personal loan emi'];
 const EMI_TRIGGERS_HI = ['emi', 'ईएमआई', 'मासिक किस्त', 'लोन कैलकुलेटर', 'लोन की किस्त', 'मासिक भुगतान'];
@@ -627,6 +791,7 @@ async function handleEMIQuery(text) {
     const data = await res.json();
     removeTyping();
     addEMIWidget(p, r, t, data);
+    updateSummaryCard(text, 'neutral', lang);
   } catch {
     removeTyping();
     await callAPI(text); // fallback to normal chat
